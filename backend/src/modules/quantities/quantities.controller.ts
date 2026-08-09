@@ -98,24 +98,12 @@ export const exportBOQ = async (req: AuthRequest, res: Response) => {
   const totalRow = ws.addRow({ name: 'TOTAL ITEMS', quantity: quantities.length });
   totalRow.font = { bold: true };
 
-  // ── Save file ────────────────────────────────────────────────────────────────
-  const exportsDir = path.resolve(process.cwd(), 'src/uploads/exports');
-  if (!fs.existsSync(exportsDir)) fs.mkdirSync(exportsDir, { recursive: true });
-
+  // ── Stream file directly to response ──────────────────────────────────────────
   const fileName = `BOQ_${project.name.replace(/\s+/g, '_')}_${Date.now()}.xlsx`;
-  const filePath = path.join(exportsDir, fileName);
-  await workbook.xlsx.writeFile(filePath);
+  
+  res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+  res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
 
-  const stats = fs.statSync(filePath);
-  const fileSizeMb = stats.size / (1024 * 1024);
-
-  const boqExport = await prisma.bOQExport.create({
-    data: { projectId, filePath, fileSizeMb },
-  });
-
-  res.status(200).json({
-    status: 'success',
-    data: boqExport,
-    downloadUrl: `/uploads/exports/${fileName}`,
-  });
+  await workbook.xlsx.write(res);
+  res.end();
 };
