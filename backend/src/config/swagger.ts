@@ -12,8 +12,8 @@ const swaggerDefinition = {
   },
   servers: [
     {
-      url: process.env.BASE_URL || 'http://localhost:5000',
-      description: 'Server',
+      url: process.env.BASE_URL || '/',
+      description: 'API Server',
     },
   ],
   components: {
@@ -42,18 +42,20 @@ const options: swaggerJSDoc.Options = {
 
 const swaggerSpec = swaggerJSDoc(options);
 
-// Use a stable CDN version for Swagger UI assets
-const SWAGGER_CDN = 'https://unpkg.com/swagger-ui-dist@5.11.0';
+// Use a stable CDN version for Swagger UI assets (cdnjs is less likely to be blocked by Tracking Prevention)
+const SWAGGER_CSS = 'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.11.0/swagger-ui.min.css';
+const SWAGGER_BUNDLE = 'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.11.0/swagger-ui-bundle.min.js';
+const SWAGGER_PRESET = 'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.11.0/swagger-ui-standalone-preset.min.js';
 
 export const setupSwagger = (app: Express) => {
   app.use(
     '/api-docs',
     swaggerUi.serve,
     swaggerUi.setup(swaggerSpec, {
-      customCssUrl: `${SWAGGER_CDN}/swagger-ui.css`,
+      customCssUrl: SWAGGER_CSS,
       customJs: [
-        `${SWAGGER_CDN}/swagger-ui-bundle.js`,
-        `${SWAGGER_CDN}/swagger-ui-standalone-preset.js`,
+        SWAGGER_BUNDLE,
+        SWAGGER_PRESET,
       ],
     })
   );
