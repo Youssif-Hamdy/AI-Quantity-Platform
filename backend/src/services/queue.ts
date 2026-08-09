@@ -31,6 +31,10 @@ export const drawingQueue = new Queue('drawing-processing', {
   connection: redisConnection,
 });
 
+drawingQueue.on('error', (err) => {
+  console.error('[Queue Error]', err.message);
+});
+
 // ── AI Engine Path ────────────────────────────────────────────────────────────
 const aiEnginePath = path.resolve(__dirname, '../../../ai-engine/main.py');
 
