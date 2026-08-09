@@ -1,0 +1,183 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// ----------------------------------------------------
+// Enums
+// ----------------------------------------------------
+enum Role {
+  ADMIN
+  QUANTITY_SURVEYOR
+  ENGINEER
+  VIEWER
+}
+
+enum DrawingType {
+  ARCHITECTURAL
+  CIVIL
+  MIXED
+  UNKNOWN
+}
+
+enum ProcessingStatus {
+  PENDING
+  NORMALIZING
+  DETECTING
+  ANALYZING
+  CALCULATING
+  COMPLETED
+  FAILED
+}
+
+enum ElementCategory {
+  ROOM
+  WALL
+  DOOR
+  WINDOW
+  COLUMN
+  BEAM
+  SLAB
+  STEEL_BAR
+}
+
+// ----------------------------------------------------
+// User & Auth
+// ----------------------------------------------------
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String
+  password  String
+  role      Role     @default(QUANTITY_SURVEYOR)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  projects  Project[]
+}
+
+// ----------------------------------------------------
+// Project Management
+// ----------------------------------------------------
+model Project {
+  id          String    @id @default(uuid())
+  name        String
+  code        String?   // e.g. "PRJ-2026-001"
+  description String?
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  drawings    Drawing[]
+  boqExports  BOQExport[]
+}
+
+// ----------------------------------------------------
+// Drawing / Blueprint Sheet
+// ----------------------------------------------------
+model Drawing {
+  id            String           @id @default(uuid())
+  projectId     String
+  project       Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  fileName      String
+  originalPath  String
+  fileSizeMb    Float
+  mimeType      String
+  sha256        String?
+  totalPages    Int              @default(1)
+  drawingType   DrawingType      @default(UNKNOWN)
+  status        ProcessingStatus @default(PENDING)
+  errorMessage  String?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  pages         DrawingPage[]
+  quantities    QuantityItem[]
+}
+
+// ----------------------------------------------------
+// Single Converted Page (PNG Image)
+// ----------------------------------------------------
+model DrawingPage {
+  id           String   @id @default(uuid())
+  drawingId    String
+  drawing      Drawing  @relation(fields: [drawingId], references: [id], onDelete: Cascade)
+  pageNumber   Int
+  imageUrl     String   // High-res PNG path
+  widthPx      Int?
+  heightPx     Int?
+  dpi          Int      @default(300)
+  scaleMeters  Float?   // Pixels per meter calibration
+  createdAt    DateTime @default(now())
+
+  elements     DrawingElement[]
+}
+
+// ----------------------------------------------------
+// Detected Spatial Element (Rooms, Columns, Doors, etc.)
+// ----------------------------------------------------
+model DrawingElement {
+  id          String          @id @default(uuid())
+  pageId      String
+  page        DrawingPage     @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  category    ElementCategory
+  name        String          // e.g. "Master Bedroom", "C1", "D2"
+  
+  // Bounding Box Coordinates (0-1000 scale: [ymin, xmin, ymax, xmax])
+  box2d       Int[]
+  
+  // Polygonal Boundary Points [[x,y], ...]
+  polygon     Json?
+
+  // Geometry Metrics
+  area        Float?          // m²
+  perimeter   Float?          // m
+  length      Float?          // m
+  width       Float?          // m
+  height      Float?          // m
+  thickness   Float?          // m
+  volume      Float?          // m³
+  quantity    Int             @default(1)
+
+  // Finishes & Properties
+  metadata    Json?           // { "flooring": "Ceramic", "rebar_dia": 16, "walls_area": 45.2 }
+
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@index([pageId, category])
+}
+
+// ----------------------------------------------------
+// Calculated Quantity Line Item (BOQ Entry)
+// ----------------------------------------------------
+model QuantityItem {
+  id          String      @id @default(uuid())
+  drawingId   String
+  drawing     Drawing     @relation(fields: [drawingId], references: [id], onDelete: Cascade)
+  code        String?     // e.g. "BOQ-CONC-01"
+  name        String      // e.g. "Concrete — Total Volume"
+  category    String      // "Structural", "Finishes", "Openings"
+  quantity    Float
+  unit        String      // "m³", "m²", "m", "pcs", "kg"
+  unitPrice   Float?
+  totalPrice  Float?
+  notes       String?
+  createdAt   DateTime    @default(now())
+}
+
+// ----------------------------------------------------
+// Exported BOQ Files (.xlsx)
+// ----------------------------------------------------
+model BOQExport {
+  id          String   @id @default(uuid())
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  filePath    String
+  fileSizeMb  Float
+  createdAt   DateTime @default(now())
+}
