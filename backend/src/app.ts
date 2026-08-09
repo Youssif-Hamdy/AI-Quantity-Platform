@@ -12,17 +12,19 @@ const app: Application = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
-// Allow Swagger UI to load its self-hosted scripts/styles (no unsafe-inline needed for non-CDN)
+// CSP: allow unpkg CDN for Swagger UI assets + unsafe-inline for its init script
 app.use(
   helmet({
     crossOriginResourcePolicy: false,
     contentSecurityPolicy: {
       directives: {
-        defaultSrc: ["'self'"],
-        scriptSrc: ["'self'", "'unsafe-inline'"],
-        styleSrc: ["'self'", "'unsafe-inline'"],
-        imgSrc: ["'self'", 'data:', 'https:'],
-        connectSrc: ["'self'"],
+        defaultSrc:   ["'self'"],
+        scriptSrc:    ["'self'", 'https://unpkg.com', "'unsafe-inline'"],
+        styleSrc:     ["'self'", 'https://unpkg.com', "'unsafe-inline'"],
+        imgSrc:       ["'self'", 'data:', 'https:'],
+        connectSrc:   ["'self'", 'https:'],
+        fontSrc:      ["'self'", 'https:', 'data:'],
+        workerSrc:    ["'self'", 'blob:'],
       },
     },
   })

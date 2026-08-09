@@ -25,22 +25,32 @@ const options: swaggerJSDoc.Options = {
         },
       },
     },
-    security: [
-      {
-        bearerAuth: [],
-      },
-    ],
+    security: [{ bearerAuth: [] }],
   },
   apis: ['./src/modules/**/*.routes.ts'],
 };
 
 const swaggerSpec = swaggerJSDoc(options);
 
+// Use a stable CDN version for Swagger UI assets
+const SWAGGER_CDN = 'https://unpkg.com/swagger-ui-dist@5.11.0';
+
 export const setupSwagger = (app: Express) => {
-  // Serve Swagger UI static assets directly from the package (no CDN needed)
   app.use(
     '/api-docs',
     swaggerUi.serve,
-    swaggerUi.setup(swaggerSpec)
+    swaggerUi.setup(swaggerSpec, {
+      customCssUrl: `${SWAGGER_CDN}/swagger-ui.css`,
+      customJs: [
+        `${SWAGGER_CDN}/swagger-ui-bundle.js`,
+        `${SWAGGER_CDN}/swagger-ui-standalone-preset.js`,
+      ],
+    })
   );
+
+  // Expose the raw spec as JSON (useful for external tools)
+  app.get('/api-docs.json', (_req, res) => {
+    res.setHeader('Content-Type', 'application/json');
+    res.send(swaggerSpec);
+  });
 };
