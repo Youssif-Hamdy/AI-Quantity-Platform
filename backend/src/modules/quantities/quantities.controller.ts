@@ -4,7 +4,7 @@ import fs from 'fs';
 import prisma from '../../database/prisma';
 import { AuthRequest } from '../../middlewares/auth';
 import ExcelJS from 'exceljs';
-import { Drawing, QuantityItem } from '@prisma/client';
+import type { Drawing, QuantityItem } from '@prisma/client';
 
 export const getQuantities = async (req: AuthRequest, res: Response) => {
   const drawingId = req.query['drawingId'] as string;
