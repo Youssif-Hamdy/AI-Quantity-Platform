@@ -4,7 +4,9 @@ import fs from 'fs';
 import prisma from '../../database/prisma';
 import { AuthRequest } from '../../middlewares/auth';
 import ExcelJS from 'exceljs';
-import type { Drawing, QuantityItem } from '@prisma/client';
+
+type DrawingType = Awaited<ReturnType<typeof prisma.drawing.findMany>>[0];
+type QuantityItemType = Awaited<ReturnType<typeof prisma.quantityItem.findMany>>[0];
 
 export const getQuantities = async (req: AuthRequest, res: Response) => {
   const drawingId = req.query['drawingId'] as string;
@@ -30,7 +32,7 @@ export const exportBOQ = async (req: AuthRequest, res: Response) => {
   }
 
   const drawings = await prisma.drawing.findMany({ where: { projectId } });
-  const drawingIds = drawings.map((d: Drawing) => d.id);
+  const drawingIds = drawings.map((d: DrawingType) => d.id);
 
   const quantities = await prisma.quantityItem.findMany({
     where: { drawingId: { in: drawingIds } },
@@ -70,7 +72,7 @@ export const exportBOQ = async (req: AuthRequest, res: Response) => {
   ws.getRow(1).height = 24;
 
   // Data rows
-  quantities.forEach((q: QuantityItem, idx: number) => {
+  quantities.forEach((q: QuantityItemType, idx: number) => {
     const row = ws.addRow({
       num: idx + 1,
       code: q.code ?? 'N/A',
