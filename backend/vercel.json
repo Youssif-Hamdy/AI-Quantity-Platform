@@ -3,14 +3,12 @@
   "builds": [
     {
       "src": "api/index.ts",
-      "use": "@vercel/node"
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": "src/modules/**/*.routes.ts"
+      }
     }
   ],
-  "functions": {
-    "api/index.ts": {
-      "includeFiles": "src/modules/**/*.routes.ts"
-    }
-  },
   "rewrites": [
     {
       "source": "/(.*)",
