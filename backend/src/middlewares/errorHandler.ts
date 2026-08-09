@@ -8,7 +8,7 @@ export const errorHandler = (
 ) => {
   console.error('[Error]', err);
 
-  // Zod validation error
+  // Zod validation er
   if (err?.name === 'ZodError' || err?.issues) {
     return res.status(400).json({
       status: 'error',
