@@ -12,8 +12,8 @@ const options: swaggerJSDoc.Options = {
     },
     servers: [
       {
-        url: 'http://localhost:5000',
-        description: 'Development server',
+        url: process.env.BASE_URL || 'http://localhost:5000',
+        description: 'Server',
       },
     ],
     components: {
@@ -37,16 +37,10 @@ const options: swaggerJSDoc.Options = {
 const swaggerSpec = swaggerJSDoc(options);
 
 export const setupSwagger = (app: Express) => {
-  const CSS_URL = 'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger-ui.min.css';
+  // Serve Swagger UI static assets directly from the package (no CDN needed)
   app.use(
     '/api-docs',
     swaggerUi.serve,
-    swaggerUi.setup(swaggerSpec, { 
-      customCssUrl: CSS_URL,
-      customJs: [
-        'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger-ui-bundle.js',
-        'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger-ui-standalone-preset.js'
-      ]
-    })
+    swaggerUi.setup(swaggerSpec)
   );
 };
