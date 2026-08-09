@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "tsx src/server.ts",
     "build": "prisma generate && tsc",
-    "postinstall": "prisma generate"
+    "postinstall": "node -e \"process.env.DATABASE_URL && require('child_process').execSync('prisma generate', {stdio:'inherit'})\""
   },
   "keywords": [],
   "author": "",

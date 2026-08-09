@@ -1,5 +1,7 @@
 {
   "version": 2,
+  "installCommand": "npm install --ignore-scripts",
+  "buildCommand": "prisma generate",
   "builds": [
     {
       "src": "api/index.ts",
@@ -7,7 +9,9 @@
       "config": {
         "includeFiles": [
           "src/**",
-          "prisma/**"
+          "prisma/**",
+          "node_modules/.prisma/**",
+          "node_modules/@prisma/client/**"
         ]
       }
     }
