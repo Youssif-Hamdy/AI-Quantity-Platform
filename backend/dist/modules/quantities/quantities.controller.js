@@ -4,8 +4,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.exportBOQ = exports.getQuantities = void 0;
-const path_1 = __importDefault(require("path"));
-const fs_1 = __importDefault(require("fs"));
 const prisma_1 = __importDefault(require("../../database/prisma"));
 const exceljs_1 = __importDefault(require("exceljs"));
 const getQuantities = async (req, res) => {
@@ -82,22 +80,11 @@ const exportBOQ = async (req, res) => {
     // Totals row
     const totalRow = ws.addRow({ name: 'TOTAL ITEMS', quantity: quantities.length });
     totalRow.font = { bold: true };
-    // ── Save file ────────────────────────────────────────────────────────────────
-    const exportsDir = path_1.default.resolve(process.cwd(), 'src/uploads/exports');
-    if (!fs_1.default.existsSync(exportsDir))
-        fs_1.default.mkdirSync(exportsDir, { recursive: true });
+    // ── Stream file directly to response ──────────────────────────────────────────
     const fileName = `BOQ_${project.name.replace(/\s+/g, '_')}_${Date.now()}.xlsx`;
-    const filePath = path_1.default.join(exportsDir, fileName);
-    await workbook.xlsx.writeFile(filePath);
-    const stats = fs_1.default.statSync(filePath);
-    const fileSizeMb = stats.size / (1024 * 1024);
-    const boqExport = await prisma_1.default.bOQExport.create({
-        data: { projectId, filePath, fileSizeMb },
-    });
-    res.status(200).json({
-        status: 'success',
-        data: boqExport,
-        downloadUrl: `/uploads/exports/${fileName}`,
-    });
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+    await workbook.xlsx.write(res);
+    res.end();
 };
 exports.exportBOQ = exportBOQ;
