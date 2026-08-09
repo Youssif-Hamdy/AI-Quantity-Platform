@@ -96,7 +96,7 @@ const startWorker = () => {
             // input() prompt and uses it directly.
             const pythonProcess = (0, child_process_1.spawn)('python', [aiEnginePath, filePath, drawingType], {
                 cwd: path_1.default.dirname(aiEnginePath),
-                env: { ...process.env },
+                env: { ...process.env, PYTHONIOENCODING: 'utf-8' },
             });
             let stdout = '';
             let stderr = '';
