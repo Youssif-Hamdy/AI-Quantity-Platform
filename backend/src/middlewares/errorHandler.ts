@@ -17,7 +17,7 @@ export const errorHandler = (
     });
   }
 
-  // Prisma unique constraint
+  // Prisma unique constrain
   if (err?.code === 'P2002') {
     return res.status(409).json({
       status: 'error',
