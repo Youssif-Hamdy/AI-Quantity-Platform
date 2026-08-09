@@ -12,7 +12,21 @@ const app: Application = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
-app.use(helmet({ crossOriginResourcePolicy: false }));
+// Allow Swagger UI to load its self-hosted scripts/styles (no unsafe-inline needed for non-CDN)
+app.use(
+  helmet({
+    crossOriginResourcePolicy: false,
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        imgSrc: ["'self'", 'data:', 'https:'],
+        connectSrc: ["'self'"],
+      },
+    },
+  })
+);
 app.use(morgan('dev'));
 app.use(compression());
 
