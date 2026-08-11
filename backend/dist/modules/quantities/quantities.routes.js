@@ -26,6 +26,19 @@ router.use(auth_1.authenticate);
 router.get('/', quantities_controller_1.getQuantities);
 /**
  * @swagger
+ * /api/quantities/manual:
+ *   post:
+ *     summary: Save manual canvas takeoff measurement
+ *     tags: [Quantities]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       201:
+ *         description: Created manual quantity item
+ */
+router.post('/manual', quantities_controller_1.createManualQuantity);
+/**
+ * @swagger
  * /api/quantities/export/{projectId}:
  *   get:
  *     summary: Export BOQ as Excel (.xlsx) for a project
@@ -40,7 +53,7 @@ router.get('/', quantities_controller_1.getQuantities);
  *           type: string
  *     responses:
  *       200:
- *         description: BOQ export metadata and download URL
+ *         description: BOQ export stream (.xlsx)
  */
 router.get('/export/:projectId', quantities_controller_1.exportBOQ);
 exports.default = router;

@@ -11,9 +11,18 @@ const auth_1 = require("../../middlewares/auth");
 const drawings_controller_1 = require("./drawings.controller");
 const router = (0, express_1.Router)();
 // ── Multer Setup ──────────────────────────────────────────────────────────────
-const uploadDir = path_1.default.resolve(process.cwd(), 'src/uploads/drawings');
-if (!fs_1.default.existsSync(uploadDir))
-    fs_1.default.mkdirSync(uploadDir, { recursive: true });
+const isVercel = process.env.VERCEL === '1';
+const uploadDir = isVercel
+    ? path_1.default.join('/tmp', 'drawings')
+    : path_1.default.resolve(process.cwd(), 'src/uploads/drawings');
+if (!fs_1.default.existsSync(uploadDir)) {
+    try {
+        fs_1.default.mkdirSync(uploadDir, { recursive: true });
+    }
+    catch (error) {
+        console.warn(`Could not create upload directory at ${uploadDir}`, error);
+    }
+}
 const storage = multer_1.default.diskStorage({
     destination: (_req, _file, cb) => cb(null, uploadDir),
     filename: (_req, file, cb) => {

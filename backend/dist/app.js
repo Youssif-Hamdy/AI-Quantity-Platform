@@ -15,7 +15,21 @@ const app = (0, express_1.default)();
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
 app.use((0, cors_1.default)());
-app.use((0, helmet_1.default)({ crossOriginResourcePolicy: false }));
+// CSP: allow unpkg CDN for Swagger UI assets + unsafe-inline for its init script
+app.use((0, helmet_1.default)({
+    crossOriginResourcePolicy: false,
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'"],
+            scriptSrc: ["'self'", 'https://unpkg.com', 'https://cdnjs.cloudflare.com', "'unsafe-inline'"],
+            styleSrc: ["'self'", 'https://unpkg.com', 'https://cdnjs.cloudflare.com', "'unsafe-inline'"],
+            imgSrc: ["'self'", 'data:', 'https:'],
+            connectSrc: ["'self'", 'https:'],
+            fontSrc: ["'self'", 'https:', 'data:'],
+            workerSrc: ["'self'", 'blob:'],
+        },
+    },
+}));
 app.use((0, morgan_1.default)('dev'));
 app.use((0, compression_1.default)());
 // ── Static Files (serve uploaded files & BOQ exports) ─────────────────────────
