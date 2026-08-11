@@ -166,9 +166,12 @@ model QuantityItem {
   unit        String      // "m³", "m²", "m", "pcs", "kg"
   unitPrice   Float?
   totalPrice  Float?
+  isManual    Boolean     @default(false)
+  metadata    Json?
   notes       String?
   createdAt   DateTime    @default(now())
 }
+
 
 // ----------------------------------------------------
 // Exported BOQ Files (.xlsx)

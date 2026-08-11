@@ -51,7 +51,6 @@ export const uploadDrawing = async (req: AuthRequest, res: Response) => {
   });
 
   // Add job to BullMQ queue
-  // drawingType passed to Python so it skips interactive prompt
   const pythonDrawingType =
     normalizedType === 'UNKNOWN' ? 'architectural' : normalizedType.toLowerCase();
 
@@ -70,10 +69,15 @@ export const uploadDrawing = async (req: AuthRequest, res: Response) => {
 
   console.log(`[Upload] Drawing ${drawing.id} queued for processing`);
 
+  const imageUrl = `/uploads/${req.file.filename}`;
+
   res.status(201).json({
     status: 'success',
     message: 'Drawing uploaded and queued for AI processing',
-    data: drawing,
+    data: {
+      ...drawing,
+      imageUrl,
+    },
   });
 };
 
@@ -103,7 +107,35 @@ export const getDrawing = async (req: AuthRequest, res: Response) => {
     return res.status(403).json({ status: 'error', message: 'Access denied' });
   }
 
-  res.status(200).json({ status: 'success', data: drawing });
+  const rawElements = drawing.pages.flatMap((p) => p.elements);
+  const elements = rawElements.map((el) => ({
+    id: el.id,
+    category: el.category,
+    name: el.name,
+    box_2d: el.box2d,
+    polygon: el.polygon,
+    area: el.area ?? undefined,
+    perimeter: el.perimeter ?? undefined,
+    volume: el.volume ?? undefined,
+    length: el.length ?? undefined,
+    width: el.width ?? undefined,
+    height: el.height ?? undefined,
+    walls_area: (el.metadata as any)?.walls_area,
+    doors_count: (el.metadata as any)?.doors_count,
+    windows_count: (el.metadata as any)?.windows_count,
+    unitPrice: el.category === 'COLUMN' ? 4500 : el.category === 'DOOR' ? 1200 : 180,
+  }));
+
+  const firstPageImage = drawing.pages[0]?.imageUrl || `/uploads/${path.basename(drawing.originalPath)}`;
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      ...drawing,
+      imageUrl: firstPageImage,
+      elements,
+    },
+  });
 };
 
 // ── Get All Drawings for a Project ───────────────────────────────────────────
@@ -122,7 +154,12 @@ export const getProjectDrawings = async (req: AuthRequest, res: Response) => {
     orderBy: { createdAt: 'desc' },
   });
 
-  res.status(200).json({ status: 'success', data: drawings });
+  const formatted = drawings.map((d) => ({
+    ...d,
+    imageUrl: `/uploads/${path.basename(d.originalPath)}`,
+  }));
+
+  res.status(200).json({ status: 'success', data: formatted });
 };
 
 // ── Delete Drawing ─────────────────────────────────────────────────────────────
@@ -141,7 +178,6 @@ export const deleteDrawing = async (req: AuthRequest, res: Response) => {
     return res.status(403).json({ status: 'error', message: 'Access denied' });
   }
 
-  // Remove file from disk
   try {
     if (fs.existsSync(drawing.originalPath)) {
       fs.unlinkSync(drawing.originalPath);
