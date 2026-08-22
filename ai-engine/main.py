@@ -36,25 +36,17 @@ RESET = "\033[0m"
 # Pipeline
 # ──────────────────────────────────────────────────────
 
-<<<<<<< HEAD
 def run(pdf_path: str, preset_drawing_type: str | None = None) -> None:
-=======
-def run(pdf_path: str) -> None:
->>>>>>> 0af4b7ca6d930092ac5612f983684d52058d043f
 
     from validator  import DocumentValidator
     from normalizer import DocumentNormalizer
     from parser     import DocumentParser
     from detector   import DrawingTypeDetector
-<<<<<<< HEAD
     from geometry.extractor import GeometryExtractor
     from geometry.processor import process as process_geometry
     from geometry.scale_resolver import ScaleResolver
     from geometry.topology import build_topology
     from canvas.emitter import CanvasEmitter
-=======
-    from vision     import VisionAnalyzer
->>>>>>> 0af4b7ca6d930092ac5612f983684d52058d043f
     from quantity   import QuantityCalculator
     from exporter   import Exporter
 
@@ -79,11 +71,7 @@ def run(pdf_path: str) -> None:
     # ─────────────────────────────────────────────────
     # Step 2 — Normalize (PDF → PNG)
     # ─────────────────────────────────────────────────
-<<<<<<< HEAD
     print_step("Step 2 / 8 — Normalizing PDF to images")
-=======
-    print_step("Step 2 / 7 — Normalizing PDF to images")
->>>>>>> 0af4b7ca6d930092ac5612f983684d52058d043f
 
     normalizer = DocumentNormalizer()
     pages      = normalizer.normalize(pdf)
@@ -93,11 +81,7 @@ def run(pdf_path: str) -> None:
     # ─────────────────────────────────────────────────
     # Step 3 — Parse text (OCR)
     # ─────────────────────────────────────────────────
-<<<<<<< HEAD
     print_step("Step 3 / 8 — Parsing document text")
-=======
-    print_step("Step 3 / 7 — Parsing document text")
->>>>>>> 0af4b7ca6d930092ac5612f983684d52058d043f
 
     parser   = DocumentParser()
     parsed   = parser.parse(pdf)
@@ -107,7 +91,6 @@ def run(pdf_path: str) -> None:
     # ─────────────────────────────────────────────────
     # Step 4 — Detect drawing type → confirm with user
     # ─────────────────────────────────────────────────
-<<<<<<< HEAD
     print_step("Step 4 / 8 — Detecting drawing type")
 
     detector     = DrawingTypeDetector()
@@ -145,27 +128,6 @@ def run(pdf_path: str) -> None:
     # Step 8 — Calculate quantities
     # ─────────────────────────────────────────────────
     print_step(f"Step 8 / 8 — Calculating quantities [{drawing_type.value}]")
-=======
-    print_step("Step 4 / 7 — Detecting drawing type")
-
-    detector     = DrawingTypeDetector()
-    drawing_type = detector.detect_and_confirm()
-
-    # ─────────────────────────────────────────────────
-    # Step 5 — Vision analysis
-    # ─────────────────────────────────────────────────
-    print_step(f"Step 5 / 7 — Vision analysis [{drawing_type.value}]")
-
-    analyzer      = VisionAnalyzer()
-    vision_result = analyzer.analyze(drawing_type)
-
-    print_success("Vision analysis done.")
-
-    # ─────────────────────────────────────────────────
-    # Step 6 — Calculate quantities
-    # ─────────────────────────────────────────────────
-    print_step(f"Step 6 / 7 — Calculating quantities [{drawing_type.value}]")
->>>>>>> 0af4b7ca6d930092ac5612f983684d52058d043f
 
     calculator = QuantityCalculator()
     quantities = calculator.calculate(drawing_type=drawing_type)
@@ -173,15 +135,9 @@ def run(pdf_path: str) -> None:
     print_success(f"{len(quantities.items)} quantity item(s) calculated.")
 
     # ─────────────────────────────────────────────────
-<<<<<<< HEAD
     # Step 9 — Export
     # ─────────────────────────────────────────────────
     print_step("Step 9 / 9 — Exporting to Excel")
-=======
-    # Step 7 — Export
-    # ─────────────────────────────────────────────────
-    print_step("Step 7 / 7 — Exporting to Excel")
->>>>>>> 0af4b7ca6d930092ac5612f983684d52058d043f
 
     exporter = Exporter()
     exporter.export(quantities)
@@ -213,7 +169,6 @@ def run(pdf_path: str) -> None:
 if __name__ == "__main__":
 
     if len(sys.argv) < 2:
-<<<<<<< HEAD
         print(f"\n{RED}Usage: python main.py <path_to_file> [drawing_type]{RESET}")
         print(f"  drawing_type: architectural | civil | mixed  (optional, skips interactive prompt)\n")
         sys.exit(1)
@@ -223,13 +178,6 @@ if __name__ == "__main__":
 
     try:
         run(_pdf_path, preset_drawing_type=_preset_type)
-=======
-        print(f"\n{RED}Usage: python main.py <path_to_file>{RESET}\n")
-        sys.exit(1)
-
-    try:
-        run(sys.argv[1])
->>>>>>> 0af4b7ca6d930092ac5612f983684d52058d043f
 
     except KeyboardInterrupt:
         print(f"\n{RED}Interrupted by user.{RESET}")
