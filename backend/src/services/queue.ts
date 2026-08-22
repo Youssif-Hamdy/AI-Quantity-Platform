@@ -121,24 +121,16 @@ export const startWorker = () => {
 
           // ── Step 2: Parse JSON output ─────────────────────────────────────
           try {
-<<<<<<< HEAD
             const quantitiesFile = path.join(jobDir, 'output', 'quantity.json');
-=======
-            const fs = await import('fs/promises');
-            const outputDir = path.join(path.dirname(aiEnginePath), 'output');
-            
-            // Try reading quantity.json or quantities.json
->>>>>>> 0af4b7ca6d930092ac5612f983684d52058d043f
             let quantityItems: Array<{ name: string; quantity: number; unit: string }> = [];
-            let quantitiesFile = path.join(outputDir, 'quantity.json');
 
             try {
               let raw = '';
               try {
                 raw = await fs.readFile(quantitiesFile, 'utf-8');
               } catch {
-                quantitiesFile = path.join(outputDir, 'quantities.json');
-                raw = await fs.readFile(quantitiesFile, 'utf-8');
+                const altFile = path.join(jobDir, 'output', 'quantities.json');
+                raw = await fs.readFile(altFile, 'utf-8');
               }
               const parsed = JSON.parse(raw);
               quantityItems = parsed.items ?? [];
@@ -150,94 +142,7 @@ export const startWorker = () => {
               }
             }
 
-            // ── Step 3: Parse vision.json to save spatial elements with box2d ──
-            const visionFile = path.join(outputDir, 'vision.json');
-            try {
-              const visionRaw = await fs.readFile(visionFile, 'utf-8');
-              const visionParsed = JSON.parse(visionRaw);
-
-              // Ensure DrawingPage exists
-              const page = await prisma.drawingPage.create({
-                data: {
-                  drawingId,
-                  pageNumber: 1,
-                  imageUrl: `/uploads/${path.basename(filePath)}.png`,
-                  dpi: 300,
-                },
-              });
-
-              const elementsToCreate: any[] = [];
-
-              // Architectural Rooms
-              const rooms = visionParsed.rooms || visionParsed.architectural?.rooms || [];
-              for (const r of rooms) {
-                if (r.box_2d && Array.isArray(r.box_2d)) {
-                  elementsToCreate.push({
-                    pageId: page.id,
-                    category: 'ROOM',
-                    name: r.name || 'Room',
-                    box2d: r.box_2d,
-                    area: r.area || null,
-                    perimeter: r.perimeter || null,
-                    metadata: { walls_area: r.walls_area, doors_count: r.doors?.length || 0 },
-                  });
-                }
-              }
-
-              // Civil Columns
-              const cols = visionParsed.columns || visionParsed.civil?.columns || [];
-              for (const c of cols) {
-                if (c.box_2d && Array.isArray(c.box_2d)) {
-                  elementsToCreate.push({
-                    pageId: page.id,
-                    category: 'COLUMN',
-                    name: c.label || 'Column',
-                    box2d: c.box_2d,
-                    volume: c.volume || null,
-                  });
-                }
-              }
-
-              // Beams
-              const beams = visionParsed.beams || visionParsed.civil?.beams || [];
-              for (const b of beams) {
-                if (b.box_2d && Array.isArray(b.box_2d)) {
-                  elementsToCreate.push({
-                    pageId: page.id,
-                    category: 'BEAM',
-                    name: b.label || 'Beam',
-                    box2d: b.box_2d,
-                    volume: b.volume || null,
-                  });
-                }
-              }
-
-              // Slabs
-              const slabs = visionParsed.slabs || visionParsed.civil?.slabs || [];
-              for (const s of slabs) {
-                if (s.box_2d && Array.isArray(s.box_2d)) {
-                  elementsToCreate.push({
-                    pageId: page.id,
-                    category: 'SLAB',
-                    name: s.label || 'Slab',
-                    box2d: s.box_2d,
-                    area: s.area || null,
-                    volume: s.volume || null,
-                  });
-                }
-              }
-
-              if (elementsToCreate.length > 0) {
-                await prisma.drawingElement.createMany({
-                  data: elementsToCreate,
-                });
-                console.log(`[Worker] Saved ${elementsToCreate.length} spatial element(s) with box2d coordinates to DB`);
-              }
-            } catch (vErr: any) {
-              console.warn(`[Worker] Vision JSON parsing warning:`, vErr.message);
-            }
-
-            // ── Step 4: Save QuantityItems to DB ────────────────────────────
+            // ── Step 3: Save QuantityItems to DB ────────────────────────────
             if (quantityItems.length > 0) {
               await prisma.quantityItem.createMany({
                 data: quantityItems.map((item, idx) => ({
