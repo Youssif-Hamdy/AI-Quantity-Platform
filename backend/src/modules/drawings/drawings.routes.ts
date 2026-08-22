@@ -38,10 +38,31 @@ const upload = multer({
   storage,
   limits: { fileSize: 50 * 1024 * 1024 }, // 50 MB
   fileFilter: (_req, file, cb) => {
-    if (file.mimetype === 'application/pdf') {
+    const allowedMimeTypes = [
+      'application/pdf',
+      'image/png',
+      'image/jpeg',
+      'image/jpg',
+      'image/webp',
+      'image/svg+xml',
+      'application/dwg',
+      'application/dxf',
+      'application/x-dwg',
+      'application/x-dxf',
+      'drawing/dwg',
+      'image/vnd.dwg',
+    ];
+    const ext = path.extname(file.originalname).toLowerCase();
+    const allowedExtensions = ['.pdf', '.png', '.jpg', '.jpeg', '.webp', '.svg', '.dwg', '.dxf'];
+
+    if (
+      allowedMimeTypes.includes(file.mimetype) ||
+      allowedExtensions.includes(ext) ||
+      file.mimetype.startsWith('image/')
+    ) {
       cb(null, true);
     } else {
-      cb(new Error('Only PDF files are allowed'));
+      cb(new Error('Invalid file type. Allowed formats: PDF, PNG, JPG, JPEG, WEBP, SVG, DWG, DXF'));
     }
   },
 });
@@ -53,7 +74,7 @@ router.use(authenticate as any);
  * @swagger
  * /api/drawings/upload:
  *   post:
- *     summary: Upload a PDF drawing and queue AI processing
+ *     summary: Upload a PDF/Image/CAD drawing and queue AI processing
  *     tags: [Drawings]
  *     security:
  *       - bearerAuth: []

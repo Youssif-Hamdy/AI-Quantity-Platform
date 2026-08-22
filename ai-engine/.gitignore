@@ -1,2 +1,11 @@
 .env
+<<<<<<< HEAD
 .env.*
+=======
+.env.*
+__pycache__/
+*.pyc
+input/
+output/
+temp/
+>>>>>>> 0af4b7ca6d930092ac5612f983684d52058d043f

@@ -15,23 +15,13 @@ var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (
 }) : function(o, v) {
     o["default"] = v;
 });
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
-        };
-        return ownKeys(o);
-    };
-    return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
-    };
-})();
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -65,6 +55,9 @@ function getRedisConnection() {
 const redisConnection = getRedisConnection();
 exports.drawingQueue = new bullmq_1.Queue('drawing-processing', {
     connection: redisConnection,
+});
+exports.drawingQueue.on('error', (err) => {
+    console.error('[Queue Error]', err.message);
 });
 // ── AI Engine Path ────────────────────────────────────────────────────────────
 const aiEnginePath = path_1.default.resolve(__dirname, '../../../ai-engine/main.py');
@@ -123,26 +116,111 @@ const startWorker = () => {
                 }
                 // ── Step 2: Parse JSON output ─────────────────────────────────────
                 try {
-                    // The AI engine writes quantities.json to output/ dir.
-                    // Also try to parse inline JSON from stdout as a fallback.
-                    const quantitiesFile = path_1.default.join(path_1.default.dirname(aiEnginePath), 'output', 'quantity.json');
                     const fs = await Promise.resolve().then(() => __importStar(require('fs/promises')));
+                    const outputDir = path_1.default.join(path_1.default.dirname(aiEnginePath), 'output');
+                    // Try reading quantity.json or quantities.json
                     let quantityItems = [];
+                    let quantitiesFile = path_1.default.join(outputDir, 'quantity.json');
                     try {
-                        const raw = await fs.readFile(quantitiesFile, 'utf-8');
+                        let raw = '';
+                        try {
+                            raw = await fs.readFile(quantitiesFile, 'utf-8');
+                        }
+                        catch {
+                            quantitiesFile = path_1.default.join(outputDir, 'quantities.json');
+                            raw = await fs.readFile(quantitiesFile, 'utf-8');
+                        }
                         const parsed = JSON.parse(raw);
-                        // QuantityResult shape: { drawing_type, items: [{name, quantity, unit}] }
                         quantityItems = parsed.items ?? [];
                     }
                     catch {
-                        // Fallback: try to parse JSON from stdout
                         const match = stdout.match(/\{[\s\S]*"items"[\s\S]*\}/);
                         if (match) {
                             const parsed = JSON.parse(match[0]);
                             quantityItems = parsed.items ?? [];
                         }
                     }
-                    // ── Step 3: Save QuantityItems to DB ────────────────────────────
+                    // ── Step 3: Parse vision.json to save spatial elements with box2d ──
+                    const visionFile = path_1.default.join(outputDir, 'vision.json');
+                    try {
+                        const visionRaw = await fs.readFile(visionFile, 'utf-8');
+                        const visionParsed = JSON.parse(visionRaw);
+                        // Ensure DrawingPage exists
+                        const page = await prisma_1.default.drawingPage.create({
+                            data: {
+                                drawingId,
+                                pageNumber: 1,
+                                imageUrl: `/uploads/${path_1.default.basename(filePath)}.png`,
+                                dpi: 300,
+                            },
+                        });
+                        const elementsToCreate = [];
+                        // Architectural Rooms
+                        const rooms = visionParsed.rooms || visionParsed.architectural?.rooms || [];
+                        for (const r of rooms) {
+                            if (r.box_2d && Array.isArray(r.box_2d)) {
+                                elementsToCreate.push({
+                                    pageId: page.id,
+                                    category: 'ROOM',
+                                    name: r.name || 'Room',
+                                    box2d: r.box_2d,
+                                    area: r.area || null,
+                                    perimeter: r.perimeter || null,
+                                    metadata: { walls_area: r.walls_area, doors_count: r.doors?.length || 0 },
+                                });
+                            }
+                        }
+                        // Civil Columns
+                        const cols = visionParsed.columns || visionParsed.civil?.columns || [];
+                        for (const c of cols) {
+                            if (c.box_2d && Array.isArray(c.box_2d)) {
+                                elementsToCreate.push({
+                                    pageId: page.id,
+                                    category: 'COLUMN',
+                                    name: c.label || 'Column',
+                                    box2d: c.box_2d,
+                                    volume: c.volume || null,
+                                });
+                            }
+                        }
+                        // Beams
+                        const beams = visionParsed.beams || visionParsed.civil?.beams || [];
+                        for (const b of beams) {
+                            if (b.box_2d && Array.isArray(b.box_2d)) {
+                                elementsToCreate.push({
+                                    pageId: page.id,
+                                    category: 'BEAM',
+                                    name: b.label || 'Beam',
+                                    box2d: b.box_2d,
+                                    volume: b.volume || null,
+                                });
+                            }
+                        }
+                        // Slabs
+                        const slabs = visionParsed.slabs || visionParsed.civil?.slabs || [];
+                        for (const s of slabs) {
+                            if (s.box_2d && Array.isArray(s.box_2d)) {
+                                elementsToCreate.push({
+                                    pageId: page.id,
+                                    category: 'SLAB',
+                                    name: s.label || 'Slab',
+                                    box2d: s.box_2d,
+                                    area: s.area || null,
+                                    volume: s.volume || null,
+                                });
+                            }
+                        }
+                        if (elementsToCreate.length > 0) {
+                            await prisma_1.default.drawingElement.createMany({
+                                data: elementsToCreate,
+                            });
+                            console.log(`[Worker] Saved ${elementsToCreate.length} spatial element(s) with box2d coordinates to DB`);
+                        }
+                    }
+                    catch (vErr) {
+                        console.warn(`[Worker] Vision JSON parsing warning:`, vErr.message);
+                    }
+                    // ── Step 4: Save QuantityItems to DB ────────────────────────────
                     if (quantityItems.length > 0) {
                         await prisma_1.default.quantityItem.createMany({
                             data: quantityItems.map((item, idx) => ({

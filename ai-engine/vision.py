@@ -75,7 +75,13 @@ Schema:
 {{
     "rooms": [
         {{
+<<<<<<< HEAD
             "name": "Room Name",
+=======
+            "id": "room_1",
+            "name": "Room Name",
+            "box_2d": [ymin, xmin, ymax, xmax],
+>>>>>>> 0af4b7ca6d930092ac5612f983684d52058d043f
             "length": 0.0,
             "width": 0.0,
             "height": 0.0,
@@ -92,7 +98,13 @@ Schema:
             ],
             "doors": [
                 {{
+<<<<<<< HEAD
                     "label": "D1",
+=======
+                    "id": "door_1",
+                    "label": "D1",
+                    "box_2d": [ymin, xmin, ymax, xmax],
+>>>>>>> 0af4b7ca6d930092ac5612f983684d52058d043f
                     "width": 0.0,
                     "height": 0.0,
                     "area": 0.0,
@@ -101,7 +113,13 @@ Schema:
             ],
             "windows": [
                 {{
+<<<<<<< HEAD
                     "label": "W1",
+=======
+                    "id": "win_1",
+                    "label": "W1",
+                    "box_2d": [ymin, xmin, ymax, xmax],
+>>>>>>> 0af4b7ca6d930092ac5612f983684d52058d043f
                     "width": 0.0,
                     "height": 0.0,
                     "area": 0.0,
@@ -115,9 +133,16 @@ Schema:
 CRITICAL:
 1. TRANSLATE ALL TEXT (names, labels, notes) TO ENGLISH. No Arabic allowed.
 2. Structure output hierarchically by room.
+<<<<<<< HEAD
 3. Nest walls, doors, and windows INSIDE each room.
 4. Do NOT return top-level arrays outside rooms.
 5. Return JSON only.
+=======
+3. Every element (room, door, window) MUST include a unique "id" string and a "box_2d" array [ymin, xmin, ymax, xmax] normalized on a 0 to 1000 scale representing its position on the page.
+4. Nest walls, doors, and windows INSIDE each room.
+5. Do NOT return top-level arrays outside rooms.
+6. Return JSON only.
+>>>>>>> 0af4b7ca6d930092ac5612f983684d52058d043f
 """
 
     def _prompt_civil(self, ocr_data: dict) -> str:
@@ -135,7 +160,13 @@ Schema:
 {{
     "columns": [
         {{
+<<<<<<< HEAD
             "label": "C1",
+=======
+            "id": "col_1",
+            "label": "C1",
+            "box_2d": [ymin, xmin, ymax, xmax],
+>>>>>>> 0af4b7ca6d930092ac5612f983684d52058d043f
             "length": 0.0,
             "width": 0.0,
             "height": 0.0,
@@ -145,7 +176,13 @@ Schema:
     ],
     "beams": [
         {{
+<<<<<<< HEAD
             "label": "B1",
+=======
+            "id": "beam_1",
+            "label": "B1",
+            "box_2d": [ymin, xmin, ymax, xmax],
+>>>>>>> 0af4b7ca6d930092ac5612f983684d52058d043f
             "width": 0.0,
             "height": 0.0,
             "length": 0.0,
@@ -155,7 +192,13 @@ Schema:
     ],
     "slabs": [
         {{
+<<<<<<< HEAD
             "label": "S1",
+=======
+            "id": "slab_1",
+            "label": "S1",
+            "box_2d": [ymin, xmin, ymax, xmax],
+>>>>>>> 0af4b7ca6d930092ac5612f983684d52058d043f
             "length": 0.0,
             "width": 0.0,
             "thickness": 0.0,
@@ -166,7 +209,13 @@ Schema:
     ],
     "steel_bars": [
         {{
+<<<<<<< HEAD
             "label": "T10",
+=======
+            "id": "steel_1",
+            "label": "T10",
+            "box_2d": [ymin, xmin, ymax, xmax],
+>>>>>>> 0af4b7ca6d930092ac5612f983684d52058d043f
             "diameter": 10.0,
             "length": 0.0,
             "quantity": 1,
@@ -178,11 +227,20 @@ Schema:
 CRITICAL:
 1. TRANSLATE ALL TEXT TO ENGLISH. No Arabic allowed.
 2. Extract ALL structural elements (columns, beams, slabs, steel bars).
+<<<<<<< HEAD
 3. Compute volume = length × width × height for columns and beams.
 4. Compute slab volume = length × width × thickness.
 5. Steel bar weight = (diameter² / 162) × length × quantity  (kg).
 6. All dimensions must be in metres; diameter in mm.
 7. Return JSON only.
+=======
+3. Every element MUST include a unique "id" string and a "box_2d" array [ymin, xmin, ymax, xmax] normalized on a 0 to 1000 scale.
+4. Compute volume = length × width × height for columns and beams.
+5. Compute slab volume = length × width × thickness.
+6. Steel bar weight = (diameter² / 162) × length × quantity  (kg).
+7. All dimensions must be in metres; diameter in mm.
+8. Return JSON only.
+>>>>>>> 0af4b7ca6d930092ac5612f983684d52058d043f
 """
 
     def _prompt_mixed(self, ocr_data: dict) -> str:
@@ -201,7 +259,13 @@ Schema:
     "architectural": {{
         "rooms": [
             {{
+<<<<<<< HEAD
                 "name": "Room Name",
+=======
+                "id": "room_1",
+                "name": "Room Name",
+                "box_2d": [ymin, xmin, ymax, xmax],
+>>>>>>> 0af4b7ca6d930092ac5612f983684d52058d043f
                 "length": 0.0,
                 "width": 0.0,
                 "height": 0.0,
@@ -212,27 +276,47 @@ Schema:
                     {{"name": "Wall Name", "length": 0.0, "height": 0.0, "area": 0.0}}
                 ],
                 "doors": [
+<<<<<<< HEAD
                     {{"label": "D1", "width": 0.0, "height": 0.0, "area": 0.0, "quantity": 1}}
                 ],
                 "windows": [
                     {{"label": "W1", "width": 0.0, "height": 0.0, "area": 0.0, "quantity": 1}}
+=======
+                    {{"id": "door_1", "label": "D1", "box_2d": [ymin, xmin, ymax, xmax], "width": 0.0, "height": 0.0, "area": 0.0, "quantity": 1}}
+                ],
+                "windows": [
+                    {{"id": "win_1", "label": "W1", "box_2d": [ymin, xmin, ymax, xmax], "width": 0.0, "height": 0.0, "area": 0.0, "quantity": 1}}
+>>>>>>> 0af4b7ca6d930092ac5612f983684d52058d043f
                 ]
             }}
         ]
     }},
     "civil": {{
+<<<<<<< HEAD
         "columns":   [{{"label": "C1", "length": 0.0, "width": 0.0, "height": 0.0, "volume": 0.0, "quantity": 1}}],
         "beams":     [{{"label": "B1", "width": 0.0, "height": 0.0, "length": 0.0, "volume": 0.0, "quantity": 1}}],
         "slabs":     [{{"label": "S1", "length": 0.0, "width": 0.0, "thickness": 0.0, "area": 0.0, "volume": 0.0, "quantity": 1}}],
         "steel_bars":[{{"label": "T10", "diameter": 10.0, "length": 0.0, "quantity": 1, "weight": 0.0}}]
+=======
+        "columns":   [{{"id": "col_1", "label": "C1", "box_2d": [ymin, xmin, ymax, xmax], "length": 0.0, "width": 0.0, "height": 0.0, "volume": 0.0, "quantity": 1}}],
+        "beams":     [{{"id": "beam_1", "label": "B1", "box_2d": [ymin, xmin, ymax, xmax], "width": 0.0, "height": 0.0, "length": 0.0, "volume": 0.0, "quantity": 1}}],
+        "slabs":     [{{"id": "slab_1", "label": "S1", "box_2d": [ymin, xmin, ymax, xmax], "length": 0.0, "width": 0.0, "thickness": 0.0, "area": 0.0, "volume": 0.0, "quantity": 1}}],
+        "steel_bars":[{{"id": "steel_1", "label": "T10", "box_2d": [ymin, xmin, ymax, xmax], "diameter": 10.0, "length": 0.0, "quantity": 1, "weight": 0.0}}]
+>>>>>>> 0af4b7ca6d930092ac5612f983684d52058d043f
     }}
 }}
 
 CRITICAL:
 1. TRANSLATE ALL TEXT TO ENGLISH. No Arabic allowed.
 2. Populate BOTH "architectural" and "civil" sections from the drawing.
+<<<<<<< HEAD
 3. Compute all volumes and weights as described in the schemas.
 4. Return JSON only.
+=======
+3. Every element MUST include a unique "id" string and a "box_2d" array [ymin, xmin, ymax, xmax] normalized on a 0 to 1000 scale.
+4. Compute all volumes and weights as described in the schemas.
+5. Return JSON only.
+>>>>>>> 0af4b7ca6d930092ac5612f983684d52058d043f
 """
 
     # --------------------------------------------------

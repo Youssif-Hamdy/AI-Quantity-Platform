@@ -45,7 +45,6 @@ const uploadDrawing = async (req, res) => {
         },
     });
     // Add job to BullMQ queue
-    // drawingType passed to Python so it skips interactive prompt
     const pythonDrawingType = normalizedType === 'UNKNOWN' ? 'architectural' : normalizedType.toLowerCase();
     await queue_1.drawingQueue.add('process-drawing', {
         drawingId: drawing.id,
@@ -56,10 +55,14 @@ const uploadDrawing = async (req, res) => {
         backoff: { type: 'fixed', delay: 5000 },
     });
     console.log(`[Upload] Drawing ${drawing.id} queued for processing`);
+    const imageUrl = `/uploads/${req.file.filename}`;
     res.status(201).json({
         status: 'success',
         message: 'Drawing uploaded and queued for AI processing',
-        data: drawing,
+        data: {
+            ...drawing,
+            imageUrl,
+        },
     });
 };
 exports.uploadDrawing = uploadDrawing;
@@ -85,7 +88,33 @@ const getDrawing = async (req, res) => {
     if (!project) {
         return res.status(403).json({ status: 'error', message: 'Access denied' });
     }
-    res.status(200).json({ status: 'success', data: drawing });
+    const rawElements = drawing.pages.flatMap((p) => p.elements);
+    const elements = rawElements.map((el) => ({
+        id: el.id,
+        category: el.category,
+        name: el.name,
+        box_2d: el.box2d,
+        polygon: el.polygon,
+        area: el.area ?? undefined,
+        perimeter: el.perimeter ?? undefined,
+        volume: el.volume ?? undefined,
+        length: el.length ?? undefined,
+        width: el.width ?? undefined,
+        height: el.height ?? undefined,
+        walls_area: el.metadata?.walls_area,
+        doors_count: el.metadata?.doors_count,
+        windows_count: el.metadata?.windows_count,
+        unitPrice: el.category === 'COLUMN' ? 4500 : el.category === 'DOOR' ? 1200 : 180,
+    }));
+    const firstPageImage = drawing.pages[0]?.imageUrl || `/uploads/${path_1.default.basename(drawing.originalPath)}`;
+    res.status(200).json({
+        status: 'success',
+        data: {
+            ...drawing,
+            imageUrl: firstPageImage,
+            elements,
+        },
+    });
 };
 exports.getDrawing = getDrawing;
 // ── Get All Drawings for a Project ───────────────────────────────────────────
@@ -101,7 +130,11 @@ const getProjectDrawings = async (req, res) => {
         where: { projectId },
         orderBy: { createdAt: 'desc' },
     });
-    res.status(200).json({ status: 'success', data: drawings });
+    const formatted = drawings.map((d) => ({
+        ...d,
+        imageUrl: `/uploads/${path_1.default.basename(d.originalPath)}`,
+    }));
+    res.status(200).json({ status: 'success', data: formatted });
 };
 exports.getProjectDrawings = getProjectDrawings;
 // ── Delete Drawing ─────────────────────────────────────────────────────────────
@@ -117,7 +150,6 @@ const deleteDrawing = async (req, res) => {
     if (!project) {
         return res.status(403).json({ status: 'error', message: 'Access denied' });
     }
-    // Remove file from disk
     try {
         if (fs_1.default.existsSync(drawing.originalPath)) {
             fs_1.default.unlinkSync(drawing.originalPath);

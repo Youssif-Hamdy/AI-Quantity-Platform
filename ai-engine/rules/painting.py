@@ -12,7 +12,12 @@ def calculate(data):
     total_area = 0
 
     for room in rooms:
+<<<<<<< HEAD
         perimeter = room.get("perimeter_m") or 0
+=======
+
+        perimeter = room.get("perimeter", 0)
+>>>>>>> 0af4b7ca6d930092ac5612f983684d52058d043f
 
         total_area += perimeter * WALL_HEIGHT
 

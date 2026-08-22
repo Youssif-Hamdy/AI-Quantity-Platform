@@ -40,11 +40,14 @@ class DocumentNormalizer:
         if not file_path.exists():
             raise FileNotFoundError(file_path)
 
+<<<<<<< HEAD
         # Clear old pages to prevent stale cache
         if self.pages_dir.exists():
             shutil.rmtree(self.pages_dir)
         ensure_directory(self.pages_dir)
 
+=======
+>>>>>>> 0af4b7ca6d930092ac5612f983684d52058d043f
         ext = file_path.suffix.lower()
 
         # ── Image file: copy as-is, no re-rendering ──────────

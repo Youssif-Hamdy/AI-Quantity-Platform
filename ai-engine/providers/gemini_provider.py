@@ -1,5 +1,8 @@
 import json
+<<<<<<< HEAD
 from pathlib import Path
+=======
+>>>>>>> 0af4b7ca6d930092ac5612f983684d52058d043f
 
 from google import genai
 from google.genai import types
@@ -18,8 +21,12 @@ class GeminiVisionProvider:
     def analyze(
         self,
         prompt: str,
+<<<<<<< HEAD
         image_paths: list[str | Path],
         model: str = "gemini-3.5-flash",
+=======
+        image_paths: list[str]
+>>>>>>> 0af4b7ca6d930092ac5612f983684d52058d043f
     ) -> dict:
 
         contents = [prompt]
@@ -48,7 +55,11 @@ class GeminiVisionProvider:
             )
 
         response = self.client.models.generate_content(
+<<<<<<< HEAD
             model=model,
+=======
+            model="gemini-2.5-flash",
+>>>>>>> 0af4b7ca6d930092ac5612f983684d52058d043f
             contents=contents,
         )
 
@@ -64,6 +75,7 @@ class GeminiVisionProvider:
         except Exception:
             return {
                 "raw_response": text
+<<<<<<< HEAD
             }
 
     def analyze_with_schema(
@@ -136,3 +148,6 @@ class GeminiVisionProvider:
             return json.loads(text)
         except Exception:
             return {"raw_response": text}
+=======
+            }
+>>>>>>> 0af4b7ca6d930092ac5612f983684d52058d043f

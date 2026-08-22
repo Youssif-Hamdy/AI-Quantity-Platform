@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { authenticate } from '../../middlewares/auth';
-import { getQuantities, exportBOQ } from './quantities.controller';
+import { getQuantities, createManualQuantity, exportBOQ } from './quantities.controller';
 
 const router = Router();
 
@@ -28,6 +28,20 @@ router.get('/', getQuantities as any);
 
 /**
  * @swagger
+ * /api/quantities/manual:
+ *   post:
+ *     summary: Save manual canvas takeoff measurement
+ *     tags: [Quantities]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       201:
+ *         description: Created manual quantity item
+ */
+router.post('/manual', createManualQuantity as any);
+
+/**
+ * @swagger
  * /api/quantities/export/{projectId}:
  *   get:
  *     summary: Export BOQ as Excel (.xlsx) for a project
@@ -42,7 +56,7 @@ router.get('/', getQuantities as any);
  *           type: string
  *     responses:
  *       200:
- *         description: BOQ export metadata and download URL
+ *         description: BOQ export stream (.xlsx)
  */
 router.get('/export/:projectId', exportBOQ as any);
 

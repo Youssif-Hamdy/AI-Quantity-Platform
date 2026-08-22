@@ -8,7 +8,11 @@ Applies only the rules appropriate for the detected drawing type.
 from pathlib import Path
 
 from config import (
+<<<<<<< HEAD
     GEOMETRY_OUTPUT,
+=======
+    VISION_OUTPUT,
+>>>>>>> 0af4b7ca6d930092ac5612f983684d52058d043f
     QUANTITY_OUTPUT,
 )
 
@@ -96,6 +100,7 @@ class QuantityCalculator:
     def calculate(
         self,
         drawing_type: DrawingType = DrawingType.ARCHITECTURAL,
+<<<<<<< HEAD
         geometry_file: str | Path = GEOMETRY_OUTPUT,
     ) -> QuantityResult:
 
@@ -107,6 +112,19 @@ class QuantityCalculator:
             )
 
         raw_data = load_json(geometry_file)
+=======
+        vision_file: str | Path = VISION_OUTPUT,
+    ) -> QuantityResult:
+
+        vision_file = Path(vision_file)
+
+        if not vision_file.exists():
+            raise FileNotFoundError(
+                f"{vision_file} does not exist."
+            )
+
+        raw_data = load_json(vision_file)
+>>>>>>> 0af4b7ca6d930092ac5612f983684d52058d043f
         data     = self._flatten_data(raw_data, drawing_type)
         rules    = self._get_rules(drawing_type)
 

@@ -19,20 +19,35 @@ def calculate(data: dict) -> dict | None:
         qty = slab.get("quantity", 1)
 
         # ─── Area ──────────────────────────────────────────
+<<<<<<< HEAD
         area = slab.get("area_m2")
 
         if area is None:
             L = slab.get("length_m") or 0.0
             W = slab.get("width_m")  or 0.0
+=======
+        area = slab.get("area")
+
+        if area is None:
+            L = slab.get("length") or 0.0
+            W = slab.get("width")  or 0.0
+>>>>>>> 0af4b7ca6d930092ac5612f983684d52058d043f
             area = L * W
 
         total_area += area * qty
 
         # ─── Volume ────────────────────────────────────────
+<<<<<<< HEAD
         volume = slab.get("volume_m3")
 
         if volume is None:
             T = slab.get("thickness_m") or 0.0
+=======
+        volume = slab.get("volume")
+
+        if volume is None:
+            T = slab.get("thickness") or 0.0
+>>>>>>> 0af4b7ca6d930092ac5612f983684d52058d043f
             volume = area * T
 
         total_volume += volume * qty

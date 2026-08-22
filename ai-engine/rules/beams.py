@@ -17,12 +17,21 @@ def calculate(data: dict) -> dict | None:
 
         qty = beam.get("quantity", 1)
 
+<<<<<<< HEAD
         volume = beam.get("volume_m3")
 
         if volume is None:
             W = beam.get("width_m")  or 0.0
             H = beam.get("height_m") or 0.0
             L = beam.get("length_m") or 0.0
+=======
+        volume = beam.get("volume")
+
+        if volume is None:
+            W = beam.get("width")  or 0.0
+            H = beam.get("height") or 0.0
+            L = beam.get("length") or 0.0
+>>>>>>> 0af4b7ca6d930092ac5612f983684d52058d043f
             volume = W * H * L
 
         total_volume += volume * qty
