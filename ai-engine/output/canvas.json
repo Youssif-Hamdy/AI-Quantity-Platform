@@ -1,0 +1,227 @@
+{
+    "width": 735,
+    "height": 421,
+    "scale_ratio": null,
+    "elements": [
+        {
+            "id": "bedroom_4",
+            "type": "room",
+            "name": "BED ROOM-4",
+            "polygon": [
+                {
+                    "x": 1.0,
+                    "y": 1.0
+                }
+            ],
+            "label_position": {
+                "x": 1.0,
+                "y": 1.0
+            },
+            "color": "rgba(33, 150, 243, 0.2)",
+            "metrics": {
+                "dimensions": "14'-0\" X 17'-9\"",
+                "area": "23.08 m²"
+            }
+        },
+        {
+            "id": "children_bedroom_3",
+            "type": "room",
+            "name": "CHILDREN BED ROOM-3",
+            "polygon": [
+                {
+                    "x": 1.0,
+                    "y": 1.0
+                }
+            ],
+            "label_position": {
+                "x": 1.0,
+                "y": 1.0
+            },
+            "color": "rgba(33, 150, 243, 0.2)",
+            "metrics": {
+                "dimensions": "14'-0\" X 10'-6\"",
+                "area": "13.66 m²"
+            }
+        },
+        {
+            "id": "att_toilet_1",
+            "type": "room",
+            "name": "ATT. TOILET",
+            "polygon": [
+                {
+                    "x": 1.0,
+                    "y": 1.0
+                }
+            ],
+            "label_position": {
+                "x": 1.0,
+                "y": 1.0
+            },
+            "color": "rgba(33, 150, 243, 0.2)",
+            "metrics": {
+                "dimensions": "12'-3\" X 5'-6\"",
+                "area": "6.26 m²"
+            }
+        },
+        {
+            "id": "dress_1",
+            "type": "room",
+            "name": "DRESS.",
+            "polygon": [
+                {
+                    "x": 1.0,
+                    "y": 1.0
+                }
+            ],
+            "label_position": {
+                "x": 1.0,
+                "y": 1.0
+            },
+            "color": "rgba(33, 150, 243, 0.2)",
+            "metrics": {
+                "dimensions": "5'-1 1/2\" X 6'-6\"",
+                "area": "3.10 m²"
+            }
+        },
+        {
+            "id": "gadla_store",
+            "type": "room",
+            "name": "GADLA STORE",
+            "polygon": [
+                {
+                    "x": 1.0,
+                    "y": 1.0
+                }
+            ],
+            "label_position": {
+                "x": 1.0,
+                "y": 1.0
+            },
+            "color": "rgba(33, 150, 243, 0.2)",
+            "metrics": {
+                "dimensions": "4'-6\" X 3'-0\"",
+                "area": "1.25 m²"
+            }
+        },
+        {
+            "id": "att_toilet_2",
+            "type": "room",
+            "name": "ATT. TOL",
+            "polygon": [
+                {
+                    "x": 1.0,
+                    "y": 1.0
+                }
+            ],
+            "label_position": {
+                "x": 1.0,
+                "y": 1.0
+            },
+            "color": "rgba(33, 150, 243, 0.2)",
+            "metrics": {
+                "dimensions": "10'-1 1/2\" X 5'-6\"",
+                "area": "5.17 m²"
+            }
+        },
+        {
+            "id": "gen_tol",
+            "type": "room",
+            "name": "GEN. TOL",
+            "polygon": [
+                {
+                    "x": 1.0,
+                    "y": 1.0
+                }
+            ],
+            "label_position": {
+                "x": 1.0,
+                "y": 1.0
+            },
+            "color": "rgba(33, 150, 243, 0.2)",
+            "metrics": {
+                "dimensions": "4'-6\" X 6'-6\"",
+                "area": "2.72 m²"
+            }
+        },
+        {
+            "id": "dress_2",
+            "type": "room",
+            "name": "DRESS.",
+            "polygon": [
+                {
+                    "x": 1.0,
+                    "y": 1.0
+                }
+            ],
+            "label_position": {
+                "x": 1.0,
+                "y": 1.0
+            },
+            "color": "rgba(33, 150, 243, 0.2)",
+            "metrics": {
+                "dimensions": "5'-3\" X 6'-6\"",
+                "area": "3.17 m²"
+            }
+        },
+        {
+            "id": "bedroom_2",
+            "type": "room",
+            "name": "BED ROOM-2",
+            "polygon": [
+                {
+                    "x": 1.0,
+                    "y": 1.0
+                }
+            ],
+            "label_position": {
+                "x": 1.0,
+                "y": 1.0
+            },
+            "color": "rgba(33, 150, 243, 0.2)",
+            "metrics": {
+                "dimensions": "15'-0\" X 12'-0\"",
+                "area": "16.72 m²"
+            }
+        },
+        {
+            "id": "library_study_space",
+            "type": "room",
+            "name": "LIBRARY / STUDY SPACE",
+            "polygon": [
+                {
+                    "x": 1.0,
+                    "y": 1.0
+                }
+            ],
+            "label_position": {
+                "x": 1.0,
+                "y": 1.0
+            },
+            "color": "rgba(33, 150, 243, 0.2)",
+            "metrics": {
+                "dimensions": "10'-0\" X 15'-10 1/2\"",
+                "area": "14.75 m²"
+            }
+        },
+        {
+            "id": "balcony",
+            "type": "room",
+            "name": "BALCONY",
+            "polygon": [
+                {
+                    "x": 1.0,
+                    "y": 1.0
+                }
+            ],
+            "label_position": {
+                "x": 1.0,
+                "y": 1.0
+            },
+            "color": "rgba(33, 150, 243, 0.2)",
+            "metrics": {
+                "dimensions": "7'-4 1/2\" X 16'-3\"",
+                "area": "11.13 m²"
+            }
+        }
+    ]
+}

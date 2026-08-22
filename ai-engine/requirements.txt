@@ -1,0 +1,11 @@
+pydantic
+pypdf
+unstructured
+pymupdf
+opencv-python
+numpy
+matplotlib
+Pillow
+google-genai
+python-dotenv
+shapely

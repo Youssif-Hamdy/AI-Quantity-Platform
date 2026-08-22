@@ -1,0 +1,282 @@
+{
+    "rooms": [
+        {
+            "name": "Bedroom 1",
+            "length": 5.867,
+            "width": 5.867,
+            "height": 2.743,
+            "area": 34.426,
+            "perimeter": 23.47,
+            "unit": "m",
+            "walls": [
+                {
+                    "name": "Wall 1 (Left)",
+                    "length": 5.867,
+                    "height": 2.743,
+                    "area": 16.096
+                },
+                {
+                    "name": "Wall 2 (Top)",
+                    "length": 5.867,
+                    "height": 2.743,
+                    "area": 16.096
+                },
+                {
+                    "name": "Wall 3 (Right)",
+                    "length": 5.867,
+                    "height": 2.743,
+                    "area": 16.096
+                },
+                {
+                    "name": "Wall 4 (Bottom)",
+                    "length": 5.867,
+                    "height": 2.743,
+                    "area": 16.096
+                }
+            ],
+            "doors": [
+                {
+                    "label": "D1",
+                    "width": 0.813,
+                    "height": 2.032,
+                    "area": 1.652,
+                    "quantity": 1
+                }
+            ],
+            "windows": [
+                {
+                    "label": "W1",
+                    "width": 0.914,
+                    "height": 1.219,
+                    "area": 1.115,
+                    "quantity": 2
+                }
+            ]
+        },
+        {
+            "name": "Toilet",
+            "length": 4.089,
+            "width": 5.639,
+            "height": 2.743,
+            "area": 23.064,
+            "perimeter": 19.456,
+            "unit": "m",
+            "walls": [
+                {
+                    "name": "Wall 1 (Left)",
+                    "length": 4.089,
+                    "height": 2.743,
+                    "area": 11.218
+                },
+                {
+                    "name": "Wall 2 (Top)",
+                    "length": 5.639,
+                    "height": 2.743,
+                    "area": 15.474
+                },
+                {
+                    "name": "Wall 3 (Right)",
+                    "length": 4.089,
+                    "height": 2.743,
+                    "area": 11.218
+                },
+                {
+                    "name": "Wall 4 (Bottom)",
+                    "length": 5.639,
+                    "height": 2.743,
+                    "area": 15.474
+                },
+                {
+                    "name": "Wall 5 (Internal)",
+                    "length": 4.089,
+                    "height": 2.743,
+                    "area": 11.218
+                }
+            ],
+            "doors": [
+                {
+                    "label": "D1",
+                    "width": 0.813,
+                    "height": 2.032,
+                    "area": 1.652,
+                    "quantity": 1
+                }
+            ],
+            "windows": [
+                {
+                    "label": "W1",
+                    "width": 0.914,
+                    "height": 1.219,
+                    "area": 1.115,
+                    "quantity": 1
+                }
+            ]
+        },
+        {
+            "name": "Bedroom 2",
+            "length": 5.867,
+            "width": 6.172,
+            "height": 2.743,
+            "area": 36.215,
+            "perimeter": 24.079,
+            "unit": "m",
+            "walls": [
+                {
+                    "name": "Wall 1 (Left)",
+                    "length": 5.867,
+                    "height": 2.743,
+                    "area": 16.096
+                },
+                {
+                    "name": "Wall 2 (Top)",
+                    "length": 6.172,
+                    "height": 2.743,
+                    "area": 16.936
+                },
+                {
+                    "name": "Wall 3 (Right)",
+                    "length": 5.867,
+                    "height": 2.743,
+                    "area": 16.096
+                },
+                {
+                    "name": "Wall 4 (Bottom)",
+                    "length": 6.172,
+                    "height": 2.743,
+                    "area": 16.936
+                }
+            ],
+            "doors": [
+                {
+                    "label": "D1",
+                    "width": 0.813,
+                    "height": 2.032,
+                    "area": 1.652,
+                    "quantity": 1
+                }
+            ],
+            "windows": [
+                {
+                    "label": "W1",
+                    "width": 0.914,
+                    "height": 1.219,
+                    "area": 1.115,
+                    "quantity": 2
+                }
+            ]
+        },
+        {
+            "name": "Drawing Area",
+            "length": 4.216,
+            "width": 7.912,
+            "height": 2.743,
+            "area": 33.364,
+            "perimeter": 24.257,
+            "unit": "m",
+            "walls": [
+                {
+                    "name": "Wall 1 (Left)",
+                    "length": 4.216,
+                    "height": 2.743,
+                    "area": 11.564
+                },
+                {
+                    "name": "Wall 2 (Top)",
+                    "length": 7.912,
+                    "height": 2.743,
+                    "area": 21.7
+                },
+                {
+                    "name": "Wall 3 (Right)",
+                    "length": 4.216,
+                    "height": 2.743,
+                    "area": 11.564
+                },
+                {
+                    "name": "Wall 4 (Bottom)",
+                    "length": 7.912,
+                    "height": 2.743,
+                    "area": 21.7
+                }
+            ],
+            "doors": [
+                {
+                    "label": "D1",
+                    "width": 0.813,
+                    "height": 2.032,
+                    "area": 1.652,
+                    "quantity": 2
+                },
+                {
+                    "label": "D2",
+                    "width": 1.626,
+                    "height": 2.032,
+                    "area": 3.304,
+                    "quantity": 1
+                }
+            ],
+            "windows": [
+                {
+                    "label": "W1",
+                    "width": 0.914,
+                    "height": 1.219,
+                    "area": 1.115,
+                    "quantity": 3
+                }
+            ]
+        },
+        {
+            "name": "Kitchen",
+            "length": 4.229,
+            "width": 4.343,
+            "height": 2.743,
+            "area": 18.375,
+            "perimeter": 17.145,
+            "unit": "m",
+            "walls": [
+                {
+                    "name": "Wall 1 (Left)",
+                    "length": 4.229,
+                    "height": 2.743,
+                    "area": 11.602
+                },
+                {
+                    "name": "Wall 2 (Top)",
+                    "length": 4.343,
+                    "height": 2.743,
+                    "area": 11.916
+                },
+                {
+                    "name": "Wall 3 (Right)",
+                    "length": 4.229,
+                    "height": 2.743,
+                    "area": 11.602
+                },
+                {
+                    "name": "Wall 4 (Bottom)",
+                    "length": 4.343,
+                    "height": 2.743,
+                    "area": 11.916
+                }
+            ],
+            "doors": [
+                {
+                    "label": "D1",
+                    "width": 0.813,
+                    "height": 2.032,
+                    "area": 1.652,
+                    "quantity": 1
+                }
+            ],
+            "windows": [
+                {
+                    "label": "W1",
+                    "width": 0.914,
+                    "height": 1.219,
+                    "area": 1.115,
+                    "quantity": 1
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,30 @@
+{
+    "drawing_type": "architectural",
+    "items": [
+        {
+            "name": "Doors",
+            "quantity": 0.0,
+            "unit": "pcs"
+        },
+        {
+            "name": "Windows",
+            "quantity": 0.0,
+            "unit": "pcs"
+        },
+        {
+            "name": "Floor Area",
+            "quantity": 101.00999999999999,
+            "unit": "m²"
+        },
+        {
+            "name": "Flooring",
+            "quantity": 101.01,
+            "unit": "m²"
+        },
+        {
+            "name": "Painting",
+            "quantity": 0.0,
+            "unit": "m²"
+        }
+    ]
+}

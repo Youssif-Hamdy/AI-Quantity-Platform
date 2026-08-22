@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Quantity Platform - Preview</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #0f172a;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --success: #10b981;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .card {
+            background: var(--card);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .upload-area {
+            border: 2px dashed var(--border);
+            border-radius: 8px;
+            padding: 3rem 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 1.5rem;
+        }
+
+        .upload-area:hover, .upload-area.dragover {
+            border-color: var(--primary);
+            background-color: #eff6ff;
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        select, button {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            font-size: 1rem;
+        }
+
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover:not(:disabled) {
+            background-color: var(--primary-hover);
+        }
+
+        button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .loader {
+            display: none;
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .results-area {
+            display: none;
+        }
+
+        .image-container {
+            width: 100%;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            background: #e2e8f0;
+            margin-top: 1rem;
+            position: relative;
+        }
+
+        .image-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .tab {
+            padding: 0.5rem 1.5rem;
+            background: #e2e8f0;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .tab.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        pre {
+            background: #1e293b;
+            color: #f8fafc;
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            direction: ltr;
+            text-align: left;
+            margin-top: 1rem;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>AI Quantity Platform 🚀</h1>
+        <p>نظام حصر الكميات الذكي - تجربة استخراج الإحداثيات والصور</p>
+    </header>
+
+    <div class="card">
+        <form id="uploadForm">
+            <div class="upload-area" id="dropZone" onclick="document.getElementById('fileInput').click()">
+                <div class="upload-icon">📄</div>
+                <h3 id="fileName">اضغط أو اسحب ملف (PDF أو صورة) هنا</h3>
+                <p class="text-light">صيغ مدعومة: PDF, PNG, JPG, JPEG</p>
+                <input type="file" id="fileInput" name="file" accept=".pdf,.png,.jpg,.jpeg" class="hidden">
+            </div>
+
+            <div class="form-group">
+                <label>نوع الرسم (Drawing Type):</label>
+                <select name="drawing_type" id="drawingType">
+                    <option value="architectural">معماري (Architectural)</option>
+                    <option value="civil">إنشائي (Civil)</option>
+                    <option value="mixed">مختلط (Mixed)</option>
+                </select>
+            </div>
+
+            <button type="submit" id="submitBtn">بدء التحليل واستخراج الكميات</button>
+        </form>
+    </div>
+
+    <div class="loader" id="loader">
+        <div class="spinner"></div>
+        <h3>جاري تحليل الرسم البياني بالذكاء الاصطناعي...</h3>
+        <p class="text-light">قد يستغرق هذا الأمر بضع ثوانٍ</p>
+    </div>
+
+    <div class="card results-area" id="resultsArea">
+        <h2>النتائج 📊</h2>
+        
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('preview')">المعاينة البصرية (CV Preview)</div>
+            <div class="tab" onclick="switchTab('json')">بيانات الإحداثيات (JSON)</div>
+        </div>
+
+        <div id="previewTab">
+            <p>هذه هي الصورة الناتجة من دمج رؤية الكمبيوتر (OpenCV) مع الذكاء الاصطناعي:</p>
+            <div class="image-container">
+                <img id="previewImage" src="" alt="Preview">
+            </div>
+        </div>
+
+        <div id="jsonTab" class="hidden">
+            <p>البيانات المكانية المستخرجة (Canvas JSON):</p>
+            <pre id="jsonOutput"></pre>
+        </div>
+    </div>
+</div>
+
+<script>
+    const fileInput = document.getElementById('fileInput');
+    const fileName = document.getElementById('fileName');
+    const dropZone = document.getElementById('dropZone');
+    const form = document.getElementById('uploadForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const loader = document.getElementById('loader');
+    const resultsArea = document.getElementById('resultsArea');
+    const previewImage = document.getElementById('previewImage');
+    const jsonOutput = document.getElementById('jsonOutput');
+
+    // File input handling
+    fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+            fileName.textContent = e.target.files[0].name;
+            dropZone.style.borderColor = 'var(--success)';
+        }
+    });
+
+    // Drag and drop
+    dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('dragover');
+    });
+
+    dropZone.addEventListener('dragleave', () => {
+        dropZone.classList.remove('dragover');
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+        if (e.dataTransfer.files.length > 0) {
+            fileInput.files = e.dataTransfer.files;
+            fileName.textContent = e.dataTransfer.files[0].name;
+            dropZone.style.borderColor = 'var(--success)';
+        }
+    });
+
+    // Form submission
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        if (!fileInput.files || fileInput.files.length === 0) {
+            alert('الرجاء اختيار ملف أولاً!');
+            return;
+        }
+
+        const formData = new FormData(form);
+        
+        // Show loader
+        submitBtn.disabled = true;
+        loader.style.display = 'block';
+        resultsArea.style.display = 'none';
+
+        try {
+            const response = await fetch('/api/process', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (!response.ok || !data.success) {
+                throw new Error(data.error || 'حدث خطأ غير معروف');
+            }
+
+            // Show results
+            if (data.preview_image) {
+                // Append timestamp to bust cache
+                previewImage.src = data.preview_image + '?t=' + new Date().getTime();
+            } else if (data.background_image) {
+                previewImage.src = data.background_image + '?t=' + new Date().getTime();
+            }
+            
+            jsonOutput.textContent = JSON.stringify(data.canvas_data, null, 2);
+            
+            resultsArea.style.display = 'block';
+        } catch (error) {
+            alert('خطأ في التحليل: ' + error.message);
+            console.error(error);
+        } finally {
+            submitBtn.disabled = false;
+            loader.style.display = 'none';
+        }
+    });
+
+    // Tabs
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.getElementById('previewTab').classList.add('hidden');
+        document.getElementById('jsonTab').classList.add('hidden');
+
+        if (tabId === 'preview') {
+            document.querySelectorAll('.tab')[0].classList.add('active');
+            document.getElementById('previewTab').classList.remove('hidden');
+        } else {
+            document.querySelectorAll('.tab')[1].classList.add('active');
+            document.getElementById('jsonTab').classList.remove('hidden');
+        }
+    }
+</script>
+
+</body>
+</html>
