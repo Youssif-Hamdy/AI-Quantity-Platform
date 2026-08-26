@@ -559,6 +559,26 @@ function emptyResult(): ParsedCADData {
 export function cadDataToSpatialElements(data: ParsedCADData): any[] {
   const elements: any[] = [];
 
+  // 1. Wall Segments
+  for (const wall of data.walls) {
+    const minX = Math.min(wall.p1.x, wall.p2.x);
+    const maxX = Math.max(wall.p1.x, wall.p2.x);
+    const minY = Math.min(wall.p1.y, wall.p2.y);
+    const maxY = Math.max(wall.p1.y, wall.p2.y);
+
+    elements.push({
+      id: wall.id,
+      category: 'WALL',
+      name: `Wall Segment (${(wall.lengthPx * data.scaleRatio).toFixed(2)}m)`,
+      box_2d: [minY, minX, maxY, maxX],
+      wallSegment: { p1: wall.p1, p2: wall.p2, thicknessPx: wall.thicknessPx || 5 },
+      length: Math.round(wall.lengthPx * data.scaleRatio * 100) / 100,
+      unitPrice: 320,
+      _isReal: true,
+    });
+  }
+
+  // 2. Room Polygons
   for (const room of data.rooms) {
     const { minX, minY, maxX, maxY } = room.boundingBox;
     elements.push({
@@ -577,6 +597,7 @@ export function cadDataToSpatialElements(data: ParsedCADData): any[] {
     });
   }
 
+  // 3. Structural Columns
   for (const col of data.columns) {
     elements.push({
       id: col.id,
@@ -592,6 +613,7 @@ export function cadDataToSpatialElements(data: ParsedCADData): any[] {
     });
   }
 
+  // 4. Doors & Openings
   for (const door of data.doors) {
     elements.push({
       id: door.id,
@@ -607,6 +629,7 @@ export function cadDataToSpatialElements(data: ParsedCADData): any[] {
     });
   }
 
+  // 5. Windows
   for (const win of data.windows) {
     const cx = (win.x1 + win.x2) / 2;
     const cy = (win.y1 + win.y2) / 2;

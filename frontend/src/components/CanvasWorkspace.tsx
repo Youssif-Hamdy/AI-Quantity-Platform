@@ -84,11 +84,14 @@ export const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
   const [layers, setLayers] = useState<LayerVisibility>({ rooms: true, structure: true, openings: true, manual: true });
   const svgRef = useRef<SVGSVGElement | null>(null);
 
-  // For CAD vector drawings (DXF/DWG), imageUrl is empty. Only use image if it's a real uploaded image URL (data: or http/https image)
+  // For CAD vector drawings (DXF/DWG), imageUrl is empty. Only use image if it's a real uploaded image URL (data:, blob:, http, or /uploads)
   const isCadFile = drawing.fileName?.toLowerCase().endsWith('.dxf') || drawing.fileName?.toLowerCase().endsWith('.dwg');
-  const sampleImage = !isCadFile && drawing.imageUrl && (drawing.imageUrl.startsWith('http') || drawing.imageUrl.startsWith('data:') || drawing.imageUrl.startsWith('/uploads'))
-    ? drawing.imageUrl
-    : null;
+  const sampleImage = !isCadFile && drawing.imageUrl && (
+    drawing.imageUrl.startsWith('http') ||
+    drawing.imageUrl.startsWith('data:') ||
+    drawing.imageUrl.startsWith('blob:') ||
+    drawing.imageUrl.startsWith('/uploads')
+  ) ? drawing.imageUrl : null;
 
   const toggleNode = (nodeKey: string) => {
     setOpenTreeNodes(prev => ({ ...prev, [nodeKey]: !prev[nodeKey] }));

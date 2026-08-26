@@ -87,7 +87,14 @@ export async function parseImageToElements(
 
   return new Promise<ParsedCADData>((resolve) => {
     const img = typeof imageSource === 'string'
-      ? (() => { const el = new Image(); el.crossOrigin = 'anonymous'; el.src = imageSource; return el; })()
+      ? (() => {
+          const el = new Image();
+          if (!imageSource.startsWith('blob:') && !imageSource.startsWith('data:')) {
+            el.crossOrigin = 'anonymous';
+          }
+          el.src = imageSource;
+          return el;
+        })()
       : imageSource;
 
     const processImage = () => {
