@@ -1,7 +1,6 @@
 pydantic
 pypdf
 unstructured
-<<<<<<< HEAD
 pymupdf
 opencv-python
 numpy
@@ -10,6 +9,4 @@ Pillow
 google-genai
 python-dotenv
 shapely
-=======
-pymupdf
->>>>>>> 0af4b7ca6d930092ac5612f983684d52058d043f
+ezdxf
