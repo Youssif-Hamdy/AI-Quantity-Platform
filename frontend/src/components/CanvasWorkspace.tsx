@@ -84,7 +84,11 @@ export const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
   const [layers, setLayers] = useState<LayerVisibility>({ rooms: true, structure: true, openings: true, manual: true });
   const svgRef = useRef<SVGSVGElement | null>(null);
 
-  const sampleImage = drawing.imageUrl || 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1400&q=80';
+  // For CAD vector drawings (DXF/DWG), imageUrl is empty. Only use image if it's a real uploaded image URL (data: or http/https image)
+  const isCadFile = drawing.fileName?.toLowerCase().endsWith('.dxf') || drawing.fileName?.toLowerCase().endsWith('.dwg');
+  const sampleImage = !isCadFile && drawing.imageUrl && (drawing.imageUrl.startsWith('http') || drawing.imageUrl.startsWith('data:') || drawing.imageUrl.startsWith('/uploads'))
+    ? drawing.imageUrl
+    : null;
 
   const toggleNode = (nodeKey: string) => {
     setOpenTreeNodes(prev => ({ ...prev, [nodeKey]: !prev[nodeKey] }));
@@ -811,58 +815,6 @@ export const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
                 height: 630,
               }}
               className="rounded overflow-hidden shadow-2xl border border-cyan-900/50 relative"
-            >
-              <div className="absolute inset-0 bg-[#070a10] flex items-center justify-center overflow-hidden">
-                <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-30">
-                  <rect width="100%" height="100%" fill="url(#canvasGrid)" />
-                </svg>
-                <img
-                  src={sampleImage}
-                  alt={drawing.fileName}
-                  className="w-full h-full object-contain select-none filter invert hue-rotate-180 contrast-150 brightness-90 opacity-90"
-                />
-              </div>
-
-              <svg
-                ref={svgRef}
-                style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
-                viewBox="0 0 1000 1000"
-                preserveAspectRatio="none"
-                onClick={handleSvgClick}
-              >
-                {elements.map(el => {
-                  if (!el.box_2d || el.box_2d.length < 4) return null;
-                  if (el.category === 'ROOM' && !layers.rooms) return null;
-                  if ((el.category === 'COLUMN' || el.category === 'BEAM' || el.category === 'SLAB') && !layers.structure) return null;
-                  if ((el.category === 'DOOR' || el.category === 'WINDOW') && !layers.openings) return null;
-
-                  const [ymin, xmin, ymax, xmax] = el.box_2d;
-                  const isSelected = selectedElement?.id === el.id;
-                  const c = getElementColors(el, isSelected);
-                  const cx = (xmin + xmax) / 2;
-                  const cy = (ymin + ymax) / 2;
-                  const labelColor = ROOM_COLORS[el.id]?.label || '#ffffff';
-
-                  return (
-                    <g key={el.id} className="cursor-pointer" onClick={e => { if (activeTool !== 'SELECT') return; e.stopPropagation(); onSelectElement(isSelected ? null : el); }}>
-                      <rect
-                        x={xmin} y={ymin}
-                        width={xmax - xmin} height={ymax - ymin}
-                        fill={c.fill} stroke={c.stroke}
-                        strokeWidth={isSelected ? 3 : 1.5}
-                        strokeDasharray={isSelected ? '6 3' : 'none'}
-                        rx={el.category === 'ROOM' ? 4 : 2}
-                      />
-                      {el.category === 'ROOM' && (
-                        <>
-                          <text x={cx} y={cy - 6} fill={labelColor} fontSize={17} fontWeight="700" textAnchor="middle" pointerEvents="none" fontFamily="Inter, sans-serif">{el.name}</text>
-                          {el.area !== undefined && (
-                            <text x={cx} y={cy + 14} fill={labelColor} fontSize={13} textAnchor="middle" pointerEvents="none" opacity={0.85} fontFamily="JetBrains Mono, monospace">{el.area} m²</text>
-                          )}
-                        </>
-                      )}
-                    </g>
-                  );
                 })}
 
                 {layers.manual && manualMeasurements.map(m => {
