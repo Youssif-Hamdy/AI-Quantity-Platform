@@ -203,42 +203,82 @@ export const startWorker = () => {
             }
 
             if (canvasData && canvasData.elements && pageRecords.length > 0) {
-               const firstPage = pageRecords.find(p => p.pageNumber === 1) || pageRecords[0];
+               const firstPage = pageRecords.find((p: any) => p.pageNumber === 1) || pageRecords[0];
                
                const elementsToInsert = canvasData.elements.map((el: any) => {
+                 // ── Category mapping ──────────────────────────────────────
                  let category = 'ROOM';
+                 if (el.type === 'wall')   category = 'WALL';
                  if (el.type === 'column') category = 'COLUMN';
-                 if (el.type === 'beam') category = 'BEAM';
-                 if (el.type === 'slab') category = 'SLAB';
-                 if (el.type === 'door') category = 'DOOR';
+                 if (el.type === 'beam')   category = 'BEAM';
+                 if (el.type === 'slab')   category = 'SLAB';
+                 if (el.type === 'door')   category = 'DOOR';
                  if (el.type === 'window') category = 'WINDOW';
 
-                 const metadata = { ...el.metrics, color: el.color, id: el.id };
+                 // ── Metric extraction ─────────────────────────────────────
+                 const metrics = el.metrics || {};
+                 const metadata = { ...metrics, color: el.color, id: el.id };
+
+                 // Parse area (e.g. "42.50 m²" → 42.50)
+                 let area: number | null = null;
+                 const areaStr = metrics.area || '';
+                 if (areaStr) {
+                   const m = areaStr.match(/[\d.]+/);
+                   if (m) area = parseFloat(m[0]);
+                 }
+
+                 // Parse length for beams/walls
+                 let length: number | null = null;
+                 const lenStr = metrics.length || '';
+                 if (lenStr) {
+                   const m = lenStr.match(/[\d.]+/);
+                   if (m) length = parseFloat(m[0]);
+                 }
+
+                 // ── box_2d — use pre-computed field if available ───────────
                  let box2d: number[] = [0, 0, 0, 0];
-                 if (el.polygon && Array.isArray(el.polygon) && el.polygon.length > 0) {
-                     const xs = el.polygon.map((p: any) => p.x);
-                     const ys = el.polygon.map((p: any) => p.y);
-                     box2d = [Math.round(Math.min(...ys)), Math.round(Math.min(...xs)), Math.round(Math.max(...ys)), Math.round(Math.max(...xs))];
-                 } else if (el.position || el.center || el.start) {
-                     const pt = el.position || el.center || el.start;
-                     box2d = [Math.round(pt.y - 10), Math.round(pt.x - 10), Math.round(pt.y + 10), Math.round(pt.x + 10)];
+                 if (el.box_2d && Array.isArray(el.box_2d) && el.box_2d.length === 4) {
+                   box2d = el.box_2d;
+                 } else if (el.polygon && Array.isArray(el.polygon) && el.polygon.length > 0) {
+                   const xs = el.polygon.map((p: any) => p.x);
+                   const ys = el.polygon.map((p: any) => p.y);
+                   box2d = [Math.round(Math.min(...ys)), Math.round(Math.min(...xs)),
+                             Math.round(Math.max(...ys)), Math.round(Math.max(...xs))];
+                 } else if (el.center) {
+                   const cx = Math.round(el.center.x > 1.0 ? el.center.x : el.center.x * 1000);
+                   const cy = Math.round(el.center.y > 1.0 ? el.center.y : el.center.y * 1000);
+                   box2d = [cy - 20, cx - 20, cy + 20, cx + 20];
+                 } else if (el.start && el.end) {
+                   const pts = [el.start, el.end];
+                   const xs = pts.map((p: any) => p.x > 1.0 ? p.x : p.x * 1000);
+                   const ys = pts.map((p: any) => p.y > 1.0 ? p.y : p.y * 1000);
+                   box2d = [Math.round(Math.min(...ys)), Math.round(Math.min(...xs)),
+                             Math.round(Math.max(...ys)), Math.round(Math.max(...xs))];
+                 } else if (el.position) {
+                   const px = el.position.x > 1.0 ? el.position.x : el.position.x * 1000;
+                   const py = el.position.y > 1.0 ? el.position.y : el.position.y * 1000;
+                   box2d = [Math.round(py - 15), Math.round(px - 15),
+                             Math.round(py + 15), Math.round(px + 15)];
                  }
 
                  return {
-                   pageId: firstPage.id,
+                   pageId:   firstPage.id,
                    category: category as any,
-                   name: el.name || el.label || el.type,
-                   polygon: el.polygon || null,
-                   box2d: box2d,
-                   metadata: metadata
+                   name:     el.name || el.label || el.type || 'Unknown',
+                   polygon:  el.polygon || null,
+                   box2d,
+                   area,
+                   length,
+                   metadata,
                  };
                });
 
                await prisma.drawingElement.createMany({
-                 data: elementsToInsert
+                 data: elementsToInsert,
                });
                console.log(`[Worker] Saved ${elementsToInsert.length} canvas elements to DB`);
             }
+
 
             // ── Step 5: Mark COMPLETED ───────────────────────────────────────
             await prisma.drawing.update({

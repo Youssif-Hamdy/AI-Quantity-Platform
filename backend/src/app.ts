@@ -44,11 +44,15 @@ import authRoutes from './modules/auth/auth.routes';
 import projectRoutes from './modules/projects/projects.routes';
 import drawingRoutes from './modules/drawings/drawings.routes';
 import quantityRoutes from './modules/quantities/quantities.routes';
+import dwgConvertRoutes from './modules/drawings/dwg-convert.routes';
+
 
 app.use('/api/auth', authRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/drawings', drawingRoutes);
 app.use('/api/quantities', quantityRoutes);
+app.use('/api/convert', dwgConvertRoutes);
+
 
 // ── Health Check ──────────────────────────────────────────────────────────────
 app.get('/health', (_req, res) => {

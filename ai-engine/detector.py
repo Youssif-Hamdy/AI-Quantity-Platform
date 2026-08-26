@@ -32,7 +32,7 @@ class DrawingTypeDetector:
     Step 1 of the pipeline:
     - Sends the first page image to Gemini
     - Receives a JSON classification
-    - Displays a confirmation prompt to the user
+    - Displays a confirmation prompt to the user (or uses preset in non-interactive mode)
     - Returns the confirmed DrawingType
     """
 
@@ -52,12 +52,8 @@ class DrawingTypeDetector:
         if not self.pages_dir.exists():
             return []
 
-<<<<<<< HEAD
         images = sorted(self.pages_dir.glob("page_*.*"))
         images = [p for p in images if p.suffix.lower() in {".png", ".jpg", ".jpeg"}]
-=======
-        images = sorted(self.pages_dir.glob("*.png"))
->>>>>>> 0af4b7ca6d930092ac5612f983684d52058d043f
         images = images[: self.MAX_PAGES_FOR_DETECTION]
         return [str(p) for p in images]
 
@@ -214,7 +210,6 @@ Return JSON only.
     # High-level shortcut
     # --------------------------------------------------
 
-<<<<<<< HEAD
     def detect_and_confirm(self, preset_type: str | None = None) -> DrawingType:
         """Detect drawing type, confirm with user (or use preset), return DrawingType."""
         detection = self.detect()
@@ -228,11 +223,6 @@ Return JSON only.
             except ValueError:
                 print(f"\n  {YELLOW}[!] Unknown preset type '{preset_type}' — using detected type.{RESET}")
 
-=======
-    def detect_and_confirm(self) -> DrawingType:
-        """Detect drawing type, confirm with user, return DrawingType."""
-        detection = self.detect()
->>>>>>> 0af4b7ca6d930092ac5612f983684d52058d043f
         return self.confirm(detection)
 
 

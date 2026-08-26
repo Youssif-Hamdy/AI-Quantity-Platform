@@ -107,8 +107,8 @@ export const getDrawing = async (req: AuthRequest, res: Response) => {
     return res.status(403).json({ status: 'error', message: 'Access denied' });
   }
 
-  const rawElements = drawing.pages.flatMap((p) => p.elements);
-  const elements = rawElements.map((el) => ({
+  const rawElements = drawing.pages.flatMap((p: any) => p.elements);
+  const elements = rawElements.map((el: any) => ({
     id: el.id,
     category: el.category,
     name: el.name,
@@ -154,7 +154,7 @@ export const getProjectDrawings = async (req: AuthRequest, res: Response) => {
     orderBy: { createdAt: 'desc' },
   });
 
-  const formatted = drawings.map((d) => ({
+  const formatted = drawings.map((d: any) => ({
     ...d,
     imageUrl: `/uploads/${path.basename(d.originalPath)}`,
   }));
