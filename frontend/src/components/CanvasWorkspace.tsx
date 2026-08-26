@@ -815,6 +815,160 @@ export const CanvasWorkspace: React.FC<CanvasWorkspaceProps> = ({
                 height: 630,
               }}
               className="rounded overflow-hidden shadow-2xl border border-cyan-900/50 relative"
+            >
+              <div className="absolute inset-0 bg-[#070a10] flex items-center justify-center overflow-hidden">
+                <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-30">
+                  <rect width="100%" height="100%" fill="url(#canvasGrid)" />
+                </svg>
+                {sampleImage && (
+                  <img
+                    src={sampleImage}
+                    alt={drawing.fileName}
+                    className="w-full h-full object-contain select-none filter invert hue-rotate-180 contrast-150 brightness-90 opacity-90"
+                  />
+                )}
+              </div>
+
+              <svg
+                ref={svgRef}
+                style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
+                viewBox="0 0 1000 1000"
+                preserveAspectRatio="none"
+                onClick={handleSvgClick}
+              >
+                {/* ── Real CAD Element Rendering ─────────────────────── */}
+                {elements.map(el => {
+                  if (el.category === 'ROOM' && !layers.rooms) return null;
+                  if ((el.category === 'COLUMN' || el.category === 'BEAM' || el.category === 'SLAB') && !layers.structure) return null;
+                  if ((el.category === 'DOOR' || el.category === 'WINDOW') && !layers.openings) return null;
+
+                  const isSelected = selectedElement?.id === el.id;
+                  const c = getElementColors(el, isSelected);
+                  const handleClick = (e: React.MouseEvent) => {
+                    if (activeTool !== 'SELECT') return;
+                    e.stopPropagation();
+                    onSelectElement(isSelected ? null : el);
+                  };
+
+                  if (el.category === 'WALL' && el.wallSegment) {
+                    const { p1, p2, thicknessPx = 6 } = el.wallSegment;
+                    return (
+                      <g key={el.id} className="cursor-pointer" onClick={handleClick}>
+                        <line
+                          x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y}
+                          stroke={isSelected ? '#38bdf8' : '#cbd5e1'}
+                          strokeWidth={isSelected ? thicknessPx + 2 : thicknessPx}
+                          strokeLinecap="round"
+                        />
+                      </g>
+                    );
+                  }
+
+                  if (el.category === 'ROOM' && el.polygon && el.polygon.length >= 3) {
+                    const pts = el.polygon.map((p: any) => `${p.x},${p.y}`).join(' ');
+                    const cx = el.polygon.reduce((s: number, p: any) => s + p.x, 0) / el.polygon.length;
+                    const cy = el.polygon.reduce((s: number, p: any) => s + p.y, 0) / el.polygon.length;
+                    const labelColor = ROOM_COLORS[el.id]?.label || '#c4b5fd';
+                    return (
+                      <g key={el.id} className="cursor-pointer" onClick={handleClick}>
+                        <polygon
+                          points={pts}
+                          fill={c.fill}
+                          stroke={c.stroke}
+                          strokeWidth={isSelected ? 2.5 : 1.5}
+                          strokeDasharray={isSelected ? '6 3' : 'none'}
+                        />
+                        <text x={cx} y={cy - 8} fill={labelColor} fontSize={16} fontWeight="700"
+                          textAnchor="middle" pointerEvents="none" fontFamily="Inter, sans-serif">{el.name}</text>
+                        {el.area !== undefined && (
+                          <text x={cx} y={cy + 12} fill={labelColor} fontSize={12}
+                            textAnchor="middle" pointerEvents="none" opacity={0.85}
+                            fontFamily="JetBrains Mono, monospace">{el.area} m²</text>
+                        )}
+                      </g>
+                    );
+                  }
+
+                  if (el.category === 'DOOR' && el.arcData) {
+                    const { cx, cy, r, startAngle, endAngle } = el.arcData;
+                    const rad = (deg: number) => (deg * Math.PI) / 180;
+                    const x1 = cx + r * Math.cos(rad(startAngle));
+                    const y1 = cy - r * Math.sin(rad(startAngle));
+                    const x2 = cx + r * Math.cos(rad(endAngle));
+                    const y2 = cy - r * Math.sin(rad(endAngle));
+                    const largeArc = Math.abs(endAngle - startAngle) > 180 ? 1 : 0;
+                    return (
+                      <g key={el.id} className="cursor-pointer" onClick={handleClick}>
+                        <line x1={cx} y1={cy} x2={x1} y2={y1}
+                          stroke="#f59e0b" strokeWidth={isSelected ? 3 : 2} strokeLinecap="round" />
+                        <path
+                          d={`M ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 0 ${x2} ${y2}`}
+                          fill="none" stroke="#f59e0b"
+                          strokeWidth={isSelected ? 2 : 1.5}
+                          strokeDasharray="5 3" opacity={0.8}
+                        />
+                      </g>
+                    );
+                  }
+
+                  if (el.category === 'WINDOW' && el.lineData) {
+                    const { x1, y1, x2, y2 } = el.lineData;
+                    const mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
+                    const dx = x2 - x1, dy = y2 - y1;
+                    const len = Math.sqrt(dx * dx + dy * dy);
+                    const nx = (-dy / len) * 5, ny = (dx / len) * 5;
+                    return (
+                      <g key={el.id} className="cursor-pointer" onClick={handleClick}>
+                        <line x1={x1} y1={y1} x2={x2} y2={y2}
+                          stroke="#06b6d4" strokeWidth={isSelected ? 4 : 3} />
+                        <line x1={mx - nx} y1={my - ny} x2={mx + nx} y2={my + ny}
+                          stroke="#06b6d4" strokeWidth={1.5} />
+                      </g>
+                    );
+                  }
+
+                  if (el.category === 'COLUMN') {
+                    if (!el.box_2d || el.box_2d.length < 4) return null;
+                    const [ymin, xmin, ymax, xmax] = el.box_2d;
+                    const cxc = (xmin + xmax) / 2, cyc = (ymin + ymax) / 2;
+                    const w = xmax - xmin, h = ymax - ymin;
+                    return (
+                      <g key={el.id} className="cursor-pointer" onClick={handleClick}>
+                        <rect x={xmin} y={ymin} width={w} height={h}
+                          fill={isSelected ? 'rgba(239,68,68,0.7)' : 'rgba(239,68,68,0.5)'}
+                          stroke="#ef4444" strokeWidth={isSelected ? 2.5 : 1.5} />
+                        <text x={cxc} y={cyc + 4} fill="#ffffff" fontSize={9}
+                          textAnchor="middle" fontWeight="800" pointerEvents="none">C</text>
+                      </g>
+                    );
+                  }
+
+                  if (el.box_2d && el.box_2d.length >= 4) {
+                    const [ymin, xmin, ymax, xmax] = el.box_2d;
+                    const cx = (xmin + xmax) / 2, cy = (ymin + ymax) / 2;
+                    const labelColor = ROOM_COLORS[el.id]?.label || '#c4b5fd';
+                    return (
+                      <g key={el.id} className="cursor-pointer" onClick={handleClick}>
+                        <rect x={xmin} y={ymin} width={xmax - xmin} height={ymax - ymin}
+                          fill={c.fill} stroke={c.stroke}
+                          strokeWidth={isSelected ? 3 : 1.5}
+                          strokeDasharray={isSelected ? '6 3' : 'none'}
+                          rx={el.category === 'ROOM' ? 4 : 2} />
+                        {el.category === 'ROOM' && (
+                          <>
+                            <text x={cx} y={cy - 6} fill={labelColor} fontSize={17} fontWeight="700"
+                              textAnchor="middle" pointerEvents="none">{el.name}</text>
+                            {el.area !== undefined && (
+                              <text x={cx} y={cy + 14} fill={labelColor} fontSize={13}
+                                textAnchor="middle" pointerEvents="none" opacity={0.85}>{el.area} m²</text>
+                            )}
+                          </>
+                        )}
+                      </g>
+                    );
+                  }
+
+                  return null;
                 })}
 
                 {layers.manual && manualMeasurements.map(m => {
