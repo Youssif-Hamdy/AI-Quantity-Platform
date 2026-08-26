@@ -22,6 +22,8 @@ import { parseDxfText, parseDwgBinary, type ParsedDxfData } from '../utils/dxfPa
 import { DxfSvgRenderer } from './DxfSvgRenderer';
 import { CadBlueprintSchematic } from './CadBlueprintSchematic';
 
+import { renderPdfToImageUrl } from '../utils/cadEngine/pdfEngine';
+
 interface CadReviewModalProps {
   isOpen: boolean;
   file: File | null;
@@ -74,12 +76,33 @@ export const CadReviewModal: React.FC<CadReviewModalProps> = ({
 
     const isDxfFile = file.name.toLowerCase().endsWith('.dxf');
     const isDwgFile = file.name.toLowerCase().endsWith('.dwg');
+    const isPdfFile = file.name.toLowerCase().endsWith('.pdf') || file.type === 'application/pdf';
 
     if (file.type.startsWith('image/')) {
       const url = URL.createObjectURL(file);
       setFilePreviewUrl(url);
       setDxfData(null);
       return () => URL.revokeObjectURL(url);
+    } else if (isPdfFile) {
+      setDxfData(null);
+      file
+        .arrayBuffer()
+        .then(async (buf) => {
+          try {
+            const url = await renderPdfToImageUrl(buf);
+            if (url) {
+              setFilePreviewUrl(url);
+            } else {
+              setFilePreviewUrl('https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1400&q=80');
+            }
+          } catch (_) {
+            setFilePreviewUrl('https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1400&q=80');
+          }
+        })
+        .catch((err) => {
+          console.warn('[CadReviewModal] PDF load error:', err);
+          setFilePreviewUrl('https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1400&q=80');
+        });
     } else if (isDxfFile) {
       setFilePreviewUrl(null);
       file
